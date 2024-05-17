@@ -50,7 +50,8 @@ The Dev Container set up takes care of the initial dependency installation upon 
 
 ### Running the project
 
-A launch configuration is also provided for debugging the project within Visual Studio Code, so head on to the `Run and Debug` tab to start the project.
+1. A launch configuration is also provided for debugging the project within Visual Studio Code, so head on to the `Run and Debug` tab to start the project.
+2. Visit the `Ports` tab in the bottom left corner of Visual Studio Code to view the exposed Dev Container ports and open the project in your browser by clicking on the globe icon next to the port number.
 
 ### Branching Strategy
 
