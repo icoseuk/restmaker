@@ -1,0 +1,32 @@
+{
+  "name": "restmaker",
+  "version": "1.0.0",
+  "description": "A TypeScript utility to connect to the FileMaker Data API (REST) seamlessly.",
+  "keywords": [
+    "filemaker",
+    "data",
+    "api",
+    "client",
+    "rest",
+    "typescript"
+  ],
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/icoseuk/restmaker.git"
+  },
+  "author": "Alexandros Raikos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/icoseuk/restmaker/issues"
+  },
+  "homepage": "https://github.com/icoseuk/restmaker#readme",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
