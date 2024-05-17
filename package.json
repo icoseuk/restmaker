@@ -13,8 +13,10 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
+    "test": "vitest",
     "build": "tsc",
-    "test": "vitest"
+    "format": "prettier --write .",
+    "lint": "eslint src/**/*.ts"
   },
   "repository": {
     "type": "git",
@@ -27,7 +29,13 @@
   },
   "homepage": "https://github.com/icoseuk/restmaker#readme",
   "devDependencies": {
+    "@eslint/js": "^9.2.0",
+    "eslint": "^9.2.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.2.0",
+    "prettier": "^3.2.5",
     "typescript": "^5.4.5",
+    "typescript-eslint": "^8.0.0-alpha.10",
     "vitest": "^1.6.0"
   }
 }

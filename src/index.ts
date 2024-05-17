@@ -5,5 +5,5 @@
  * @returns    A greeting message.
  */
 export const sayHello = (name: string) => {
-  return `Hello ${name}`;
-};
+  return `Hello ${name}`
+}
