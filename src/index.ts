@@ -7,3 +7,5 @@
 export const sayHello = (name: string) => {
   return `Hello ${name}`
 }
+
+export { default as default } from './models/FileMakerDataAPIClient'
