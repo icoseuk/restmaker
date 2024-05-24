@@ -1,3 +1,11 @@
+import {
+  CreateRecordParameters,
+  DeleteRecordParameters,
+  DuplicateRecordParameters,
+  EditRecordParameters,
+  GetRecordParameters,
+  GetRecordRangeParameters
+} from '../types/FileMakerDataAPIClientMethodParameters'
 import FileMakerDataAPIRecord from '../types/FileMakerDataAPIRecord'
 import FileMakerDataAPICreateRecordRequest from '../types/FileMakerDataAPIRequest/FileMakerDataAPICreateRecordRequest'
 import FileMakerDataAPIGetRecordRangeRequest from '../types/FileMakerDataAPIRequest/FileMakerDataAPIGetRecordRangeRequest'
@@ -6,6 +14,7 @@ import FileMakerDataAPIRequest from '../types/FileMakerDataAPIRequest/FileMakerD
 import FileMakerDataAPICreateRecordResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPICreateRecordResponse'
 import FileMakerDataAPIDuplicateRecordResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIDuplicateRecordResponse'
 import FileMakerDataAPIEditRecordResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIEditRecordResponse'
+import FileMakerDataAPIGetRecordResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIGetRecordResponse'
 import FileMakerDataAPIResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIResponse'
 import FileMakerDataAPIVersion from '../types/FileMakerDataAPIVersion'
 import FileMakerDataAPISession from './FileMakerDataAPISession'
@@ -56,15 +65,14 @@ export default class FileMakerDataAPIClient {
 
   /**
    * Creates a new record in the specified layout.
-   *
-   * @param layout The layout to create the record in.
-   * @param fieldData The fields to set in the new record.
-   * @returns The response from the FileMaker Data API.
    */
-  createRecord = async <FieldData = FileMakerDataAPIRecord['fieldData']>(
-    layout: string,
-    fieldData: FieldData
-  ) => {
+  createRecord = async <
+    FieldData extends
+      FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData']
+  >({
+    layout,
+    fieldData
+  }: CreateRecordParameters<FieldData>) => {
     return this.session.request<
       FileMakerDataAPICreateRecordResponse,
       FileMakerDataAPICreateRecordRequest<FieldData>
@@ -75,28 +83,19 @@ export default class FileMakerDataAPIClient {
 
   /**
    * Edits a record in the specified layout.
-   *
-   * @param layout The layout to edit the record in.
-   * @param recordId The ID of the record to edit.
-   * @param fieldData The fields to set in the record.
-   * @param portalData The portal data to set in the record.
-   * @param deleteRelated The related record to delete. The format is `portalName.portalRowId`.
-   * @returns The response from the FileMaker Data API.
    */
   editRecord = async <
     FieldData extends
       FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData'],
     PortalData extends
       FileMakerDataAPIRecord['portalData'] = FileMakerDataAPIRecord['portalData']
-  >(
-    layout: string,
-    recordId: string,
-    fieldData: FieldData,
-    portalData?: PortalData,
-    deleteRelated?:
-      | `${Extract<keyof PortalData, string>}.${number}`
-      | Array<`${Extract<keyof PortalData, string>}.${number}`>
-  ) => {
+  >({
+    layout,
+    recordId,
+    fieldData,
+    portalData,
+    deleteRelated
+  }: EditRecordParameters<FieldData, PortalData>) => {
     return this.session.request<FileMakerDataAPIEditRecordResponse>(
       `/layouts/${layout}/records/${recordId}`,
       'PATCH',
@@ -115,7 +114,7 @@ export default class FileMakerDataAPIClient {
    * @param recordId The ID of the record to duplicate.
    * @returns The response from the FileMaker Data API.
    */
-  duplicateRecord = async (layout: string, recordId: string) => {
+  duplicateRecord = async ({ layout, recordId }: DuplicateRecordParameters) => {
     return this.session.request<
       FileMakerDataAPIDuplicateRecordResponse,
       FileMakerDataAPIRequest
@@ -129,7 +128,7 @@ export default class FileMakerDataAPIClient {
    * @param recordId The ID of the record to delete.
    * @returns The response from the FileMaker Data API.
    */
-  deleteRecord = async (layout: string, recordId: string) => {
+  deleteRecord = async ({ layout, recordId }: DeleteRecordParameters) => {
     return this.session.request<
       FileMakerDataAPIResponse,
       FileMakerDataAPIRequest
@@ -141,6 +140,8 @@ export default class FileMakerDataAPIClient {
    *
    * @param layout The layout to get the record from.
    * @param recordId The ID of the record to get.
+   * @param layoutResponse The layout to return the response from.
+   * @param portals The portals to include in the response.
    * @returns The response from the FileMaker Data API.
    */
   getRecord = async <
@@ -148,16 +149,12 @@ export default class FileMakerDataAPIClient {
       FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData'],
     PortalData extends
       FileMakerDataAPIRecord['portalData'] = FileMakerDataAPIRecord['portalData']
-  >(
-    layout: string,
-    recordId: string,
-    layoutResponse: string,
-    portals: {
-      name: string
-      limit: number
-      offset: number
-    }[] = []
-  ) => {
+  >({
+    layout,
+    recordId,
+    layoutResponse,
+    portals = []
+  }: GetRecordParameters) => {
     // Build the query object.
     const query: FileMakerDataAPIGetRecordQueryRequest = {
       ...portals.reduce((acc, { name, limit, offset }) => {
@@ -181,31 +178,35 @@ export default class FileMakerDataAPIClient {
 
     // Make the request to the FileMaker Data API.
     return this.session.request<
-      FileMakerDataAPIResponse<FileMakerDataAPIRecord<FieldData, PortalData>>,
+      FileMakerDataAPIGetRecordResponse<FieldData, PortalData>,
       FileMakerDataAPIRequest
     >(`/layouts/${layout}/records/${recordId}?${queryString}`, 'GET')
   }
 
+  /**
+   * Get a range of records in the specified layout.
+   *
+   * @param layout The layout to get the records from.
+   * @param startingIndex The ID of the record to start from.
+   * @param limit The maximum number of records to return.
+   * @param layoutResponse The layout to return the response from.
+   * @param portals The portals to include in the response.
+   * @param sort The sort order to use.
+   * @returns The response from the FileMaker Data API.
+   */
   getRecordRange = async <
     FieldData extends
       FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData'],
     PortalData extends
       FileMakerDataAPIRecord['portalData'] = FileMakerDataAPIRecord['portalData']
-  >(
-    layout: string,
-    startingRecordId?: 'string',
-    limit?: number,
-    layoutResponse?: string,
-    portals: {
-      name: string
-      limit: number
-      offset: number
-    }[] = [],
-    sort: {
-      fieldName: string
-      sortOrder: 'ascend' | 'descend'
-    }[] = []
-  ) => {
+  >({
+    layout,
+    startingIndex,
+    limit,
+    layoutResponse,
+    portals = [],
+    sort = []
+  }: GetRecordRangeParameters) => {
     // Build the query object.
     const query: FileMakerDataAPIGetRecordRangeRequest = {
       ...portals.reduce((acc, { name, limit, offset }) => {
@@ -217,7 +218,7 @@ export default class FileMakerDataAPIClient {
       portal: portals.length
         ? `[${portals.map(({ name }) => name).join(',')}]`
         : undefined,
-      _offset: startingRecordId,
+      _offset: startingIndex?.toString(),
       _limit: limit?.toString(),
       _sort: sort.length === 0 ? undefined : sort.toString()
     }
@@ -232,7 +233,7 @@ export default class FileMakerDataAPIClient {
 
     // Make the request to the FileMaker Data API.
     return this.session.request<
-      FileMakerDataAPIResponse<FileMakerDataAPIRecord<FieldData, PortalData>[]>,
+      FileMakerDataAPIGetRecordResponse<FieldData, PortalData>,
       FileMakerDataAPIRequest
     >(`/layouts/${layout}/records?${queryString}`, 'GET')
   }
