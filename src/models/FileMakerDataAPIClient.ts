@@ -3,11 +3,13 @@ import {
   DeleteRecordParameters,
   DuplicateRecordParameters,
   EditRecordParameters,
+  FindParameters,
   GetRecordParameters,
   GetRecordRangeParameters
 } from '../types/FileMakerDataAPIClientMethodParameters'
 import FileMakerDataAPIRecord from '../types/FileMakerDataAPIRecord'
 import FileMakerDataAPICreateRecordRequest from '../types/FileMakerDataAPIRequest/FileMakerDataAPICreateRecordRequest'
+import FileMakerDataAPIFindRequest from '../types/FileMakerDataAPIRequest/FileMakerDataAPIFindRequest'
 import FileMakerDataAPIGetRecordRangeRequest from '../types/FileMakerDataAPIRequest/FileMakerDataAPIGetRecordRangeRequest'
 import FileMakerDataAPIGetRecordQueryRequest from '../types/FileMakerDataAPIRequest/FileMakerDataAPIGetRecordRequest'
 import FileMakerDataAPIRequest from '../types/FileMakerDataAPIRequest/FileMakerDataAPIRequest'
@@ -236,5 +238,42 @@ export default class FileMakerDataAPIClient {
       FileMakerDataAPIGetRecordResponse<FieldData, PortalData>,
       FileMakerDataAPIRequest
     >(`/layouts/${layout}/records?${queryString}`, 'GET')
+  }
+
+  /**
+   * Find records in the specified layout.
+   *
+   * @throws {FileMakerDataAPIOperationException} If no records are found.
+   */
+  find = async <
+    FieldData extends
+      FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData'],
+    PortalData extends
+      FileMakerDataAPIRecord['portalData'] = FileMakerDataAPIRecord['portalData']
+  >({
+    layout,
+    query,
+    sort,
+    portals,
+    layoutResponse
+  }: FindParameters<FieldData>) => {
+    return this.session.request<
+      FileMakerDataAPIGetRecordResponse<FieldData, PortalData>,
+      FileMakerDataAPIFindRequest<FieldData>
+    >(`/layouts/${layout}/_find`, 'POST', {
+      query: query.map((parameters) => {
+        return {
+          ...parameters,
+          omit: parameters.omit ? 'true' : undefined
+        }
+      }),
+      sort,
+      'layout.response': layoutResponse,
+      ...portals?.reduce((acc, { name, limit, offset }) => {
+        acc[`offset.${name}`] = offset.toString()
+        acc[`limit.${name}`] = limit.toString()
+        return acc
+      }, {} as FileMakerDataAPIFindRequest<FieldData>)
+    })
   }
 }

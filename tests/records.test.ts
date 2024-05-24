@@ -3,6 +3,7 @@ import { afterAll, expect, expectTypeOf, test } from 'vitest'
 import { FileMakerDataAPIClient } from '../src/index'
 import ProductDetailsLayoutRecord from './layouts/ProductDetailsLayoutRecord'
 import { createTestRecord } from './lib/helpers'
+import FileMakerDataAPIOperationException from '../src/exceptions/FileMakerDataAPIOperationException'
 
 const {
   VITE_RESTMAKER_VALIDATOR_USERNAME,
@@ -121,6 +122,51 @@ test('getting a range of records in a different layout response', async () => {
   expectTypeOf(request.data[0].fieldData).toHaveProperty('Part Number')
   expectTypeOf(request.data[0].fieldData).toHaveProperty('Units on Hand')
   expect(Object.entries(request.data[0].fieldData).length).toBe(5)
+})
+
+test('finding a range of records that exist', async () => {
+  const request = await client?.find<ProductDetailsLayoutRecord>({
+    layout: 'Product Details',
+    query: [
+      {
+        Name: 'Test Product'
+      },
+      {
+        'Model Year': 2023
+      }
+    ],
+    sort: [
+      {
+        fieldName: 'Name',
+        sortOrder: 'ascend'
+      }
+    ],
+    limit: 5
+  })
+  expect(request.dataInfo).toBeDefined()
+  expect(request.data.length).greaterThan(1)
+})
+
+test("finding a range of records that don't exist", async () => {
+  await expect(
+    async () =>
+      await client?.find({
+        layout: 'Product Details',
+        query: [
+          {
+            'Model Year': 2023,
+            omit: true
+          }
+        ],
+        sort: [
+          {
+            fieldName: 'Name',
+            sortOrder: 'ascend'
+          }
+        ],
+        limit: 5
+      })
+  ).rejects.toThrow()
 })
 
 afterAll(async () => {

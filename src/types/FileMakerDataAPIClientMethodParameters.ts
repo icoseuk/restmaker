@@ -161,3 +161,65 @@ export type GetRecordRangeParameters = {
     sortOrder: 'ascend' | 'descend'
   }[]
 }
+
+export type FindParameters<FieldData extends Record<string, unknown>> = {
+  /**
+   * The layout to get the record range from.
+   */
+  layout: string
+
+  /**
+   * The query to search for.
+   */
+  query: { omit?: boolean } & {
+    /**
+     * The field to search in.
+     */
+    [k in keyof Partial<FieldData>]: FieldData[k]
+  }[]
+
+  /**
+   * The limit of the record range.
+   */
+  limit?: number
+
+  /**
+   * The layout to return the response from.
+   */
+  layoutResponse?: string
+
+  /**
+   * The portals to include in the response.
+   */
+  portals?: {
+    /**
+     * The name of the portal.
+     */
+    name: string
+
+    /**
+     * The limit of the portal records.
+     */
+    limit: number
+
+    /**
+     * The offset of the portal records.
+     */
+    offset: number
+  }[]
+
+  /**
+   * The sort order to use.
+   */
+  sort?: {
+    /**
+     * The field name to sort by.
+     */
+    fieldName: string
+
+    /**
+     * The sort order.
+     */
+    sortOrder: 'ascend' | 'descend'
+  }[]
+}
