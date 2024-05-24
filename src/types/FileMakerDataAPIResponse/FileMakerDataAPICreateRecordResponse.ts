@@ -1,6 +1,7 @@
-import FileMakerDataAPIResponse from './FileMakerDataAPIResponse'
-
-type FileMakerDataAPICreateRecordResponse = FileMakerDataAPIResponse<{
+/**
+ * The response from the FileMaker Data API when creating a record.
+ */
+type FileMakerDataAPICreateRecordResponse = {
   /**
    * The record ID of the newly created record.
    */
@@ -10,6 +11,6 @@ type FileMakerDataAPICreateRecordResponse = FileMakerDataAPIResponse<{
    * The modification ID of the newly created record (initially 0).
    */
   modId: string
-}>
+}
 
 export default FileMakerDataAPICreateRecordResponse

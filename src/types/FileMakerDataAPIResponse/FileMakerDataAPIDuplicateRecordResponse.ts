@@ -1,6 +1,7 @@
-import FileMakerDataAPIResponse from './FileMakerDataAPIResponse'
-
-type FileMakerDataAPIDuplicateRecordResponse = FileMakerDataAPIResponse<{
+/**
+ * The response from a successful request to duplicate a record.
+ */
+type FileMakerDataAPIDuplicateRecordResponse = {
   /**
    * The record ID of the newly duplicated record.
    */
@@ -10,6 +11,6 @@ type FileMakerDataAPIDuplicateRecordResponse = FileMakerDataAPIResponse<{
    * The modification ID of the newly duplicated record (initially 0).
    */
   modId: string
-}>
+}
 
 export default FileMakerDataAPIDuplicateRecordResponse

@@ -1,13 +1,11 @@
-import FileMakerDataAPIResponse from './FileMakerDataAPIResponse'
-
 /**
  * The response when editing a record.
  */
-type FileMakerDataAPIEditRecordResponse = FileMakerDataAPIResponse<{
+type FileMakerDataAPIEditRecordResponse = {
   /**
    * The new modification ID of the edited record.
    */
   modId: string
-}>
+}
 
 export default FileMakerDataAPIEditRecordResponse

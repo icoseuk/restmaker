@@ -1,11 +1,11 @@
 /// <reference types="vite/client" />
 import { expect, onTestFinished, test } from 'vitest'
-import { FileMakerDataAPISession } from '../src/index'
+import { FileMakerDataAPIClient } from '../src/index'
 
 /**
  * The FileMaker Data API session to use for testing.
  */
-let session: FileMakerDataAPISession | null = null
+let client: FileMakerDataAPIClient | null = null
 
 test('checking the environment variables', () => {
   const {
@@ -22,7 +22,7 @@ test('checking the environment variables', () => {
   expect(VITE_RESTMAKER_VALIDATOR_DATABASE).toBeDefined()
 
   // Create the session here and use it in the next test
-  session = new FileMakerDataAPISession(
+  client = new FileMakerDataAPIClient(
     VITE_RESTMAKER_VALIDATOR_USERNAME,
     VITE_RESTMAKER_VALIDATOR_PASSWORD,
     VITE_RESTMAKER_VALIDATOR_HOST,
@@ -32,8 +32,8 @@ test('checking the environment variables', () => {
 
 test('authenticating with the FileMaker Data API', async () => {
   // This test will fail if the FileMaker Data API session cannot be created.
-  expect(async () => await session?.logIn()).not.toThrow()
+  expect(async () => await client?.logIn()).not.toThrow()
 
   // This test will fail if the FileMaker Data API session is not authenticated.
-  onTestFinished(() => session?.logOut())
+  onTestFinished(() => client?.logOut())
 })

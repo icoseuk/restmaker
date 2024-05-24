@@ -15,6 +15,12 @@
       "name": "Watch Authentication Tests",
       "request": "launch",
       "type": "node-terminal"
+    },
+    {
+      "command": "npm run test:crud",
+      "name": "Watch Records Tests",
+      "request": "launch",
+      "type": "node-terminal"
     }
   ]
 }
