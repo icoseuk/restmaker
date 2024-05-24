@@ -13,7 +13,8 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "vitest",
+    "test:all": "vitest --reporter=verbose",
+    "test:auth": "vitest --reporter=verbose authentication.test.ts",
     "build": "tsc",
     "format": "prettier --write .",
     "lint": "eslint src/**/*.ts"
