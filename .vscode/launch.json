@@ -5,8 +5,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "command": "npm run test",
-      "name": "Watch Tests",
+      "command": "npm run test:all",
+      "name": "Watch All Tests",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "npm run test:auth",
+      "name": "Watch Authentication Tests",
       "request": "launch",
       "type": "node-terminal"
     }

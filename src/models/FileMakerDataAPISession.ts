@@ -1,4 +1,3 @@
-import FileMakerDataAPIHTTPException from '../exceptions/FileMakerDataAPIHTTPException'
 import FileMakerDataAPIOperationException from '../exceptions/FileMakerDataAPIOperationException'
 import FileMakerDataAPIResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIResponse'
 import FileMakerDataAPIVersion from '../types/FileMakerDataAPIVersion'
