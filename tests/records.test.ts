@@ -2,6 +2,7 @@
 import { afterAll, expect, expectTypeOf, test } from 'vitest'
 import { FileMakerDataAPIClient } from '../src/index'
 import ProductDetailsLayoutRecord from './layouts/ProductDetailsLayoutRecord'
+import { createTestRecord } from './lib/helpers'
 
 const {
   VITE_RESTMAKER_VALIDATOR_USERNAME,
@@ -30,33 +31,8 @@ let testableRecordId: string
  */
 let testableDuplicatedRecordId: string
 
-/**
- * Creates a test record.
- */
-const createTestRecord = async () => {
-  return await client?.createRecord({
-    layout: 'Product Details',
-    fieldData: {
-      Date: '01-01-2023',
-      Category: 'Household',
-      Name: 'Test Product',
-      Manufacturer: 'Test Manufacturer',
-      'Model Year': 2023,
-      'Part Number': 'ABC123',
-      'Bar Code': '1234567890',
-      Description: 'A test product',
-      Location: 'Warehouse',
-      Taxable: 'Yes',
-      'Unit Cost': '15.00',
-      'Unit Price': '20.00',
-      'Last Order': '01-01-2023',
-      'Reorder Level': 1
-    } as ProductDetailsLayoutRecord
-  })
-}
-
 test('creating a record', async () => {
-  const request = await createTestRecord()
+  const request = await createTestRecord(client)
   expect(request.recordId).toBeDefined()
   testableRecordId = request.recordId
 })
@@ -116,7 +92,7 @@ test('getting a record in a different layout response', async () => {
 
 test('getting a range of records', async () => {
   for (let i = 0; i < 10; i++) {
-    await createTestRecord()
+    await createTestRecord(client)
   }
   const request = await client?.getRecordRange({
     layout: 'Product Details',
@@ -129,7 +105,7 @@ test('getting a range of records', async () => {
 
 test('getting a range of records in a different layout response', async () => {
   for (let i = 0; i < 10; i++) {
-    await createTestRecord()
+    await createTestRecord(client)
   }
   const request = await client?.getRecordRange({
     layout: 'Product Details',
