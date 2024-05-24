@@ -66,10 +66,13 @@ export default class FileMakerDataAPISession {
    * @param method The HTTP method to use for the request.
    * @param authentication The type of authentication to use for the request. Can be 'basic' or 'bearer'.
    */
-  request = async <FileMakerDataAPIResponseData>(
+  request = async <
+    FileMakerDataAPIResponseData,
+    FileMakerDataAPIRequestData = {}
+  >(
     endpoint: RequestInfo | URL,
     method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
-    body: unknown = {},
+    body: FileMakerDataAPIRequestData = {} as FileMakerDataAPIRequestData,
     authentication: 'basic' | 'bearer' = 'bearer'
   ) => {
     // Authenticate if necessary.
@@ -91,7 +94,7 @@ export default class FileMakerDataAPISession {
           'Content-Type': 'application/json',
           Authorization: authorizationHeader
         },
-        body: JSON.stringify(body)
+        body: method === 'GET' ? undefined : JSON.stringify(body)
       }
     )
 

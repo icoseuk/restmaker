@@ -3,4 +3,4 @@
  *
  * This file is the entry point for the module.
  */
-export { default as FileMakerDataAPISession } from './models/FileMakerDataAPISession'
+export { default as FileMakerDataAPIClient } from './models/FileMakerDataAPIClient'
