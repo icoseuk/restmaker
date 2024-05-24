@@ -29,5 +29,8 @@ jobs:
       - name: 📦 Install Dependencies
         run: npm ci
 
-      - name: 🧪 Run Tests
-        run: npm run test:all
+      - name: 🧪 Test Authentication Functionality
+        run: npm run test:auth
+
+      - name: 🧪 Test FileMaker CRUD Functionality
+        run: npm run test:crud
