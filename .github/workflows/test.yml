@@ -11,6 +11,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      VITE_RESTMAKER_VALIDATOR_USERNAME: ${{ secrets.RESTMAKER_VALIDATOR_USERNAME }}
+      VITE_RESTMAKER_VALIDATOR_PASSWORD: ${{ secrets.RESTMAKER_VALIDATOR_PASSWORD }}
+      VITE_RESTMAKER_VALIDATOR_HOST: ${{ secrets.RESTMAKER_VALIDATOR_HOST }}
+      VITE_RESTMAKER_VALIDATOR_DATABASE: ${{ secrets.RESTMAKER_VALIDATOR_DATABASE }}
 
     steps:
       - name: 📂 Checkout Code
