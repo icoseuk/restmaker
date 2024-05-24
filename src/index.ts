@@ -1,11 +1,6 @@
 /**
- * Simply returns a greeting message.
+ * @file src/index.ts
  *
- * @param name  The name of the person to greet.
- * @returns    A greeting message.
+ * This file is the entry point for the module.
  */
-export const sayHello = (name: string) => {
-  return `Hello ${name}`
-}
-
-export { default as default } from './models/FileMakerDataAPIClient'
+export { default as FileMakerDataAPISession } from './models/FileMakerDataAPISession'
