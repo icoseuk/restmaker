@@ -20,6 +20,9 @@
     "format": "prettier --write .",
     "lint": "eslint src/**/*.ts"
   },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/icoseuk/restmaker.git"
