@@ -68,10 +68,15 @@ export default class FileMakerDataAPISession {
    */
   request = async <FileMakerDataAPIResponseData>(
     endpoint: RequestInfo | URL,
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
     body: unknown = {},
     authentication: 'basic' | 'bearer' = 'bearer'
   ) => {
+    // Authenticate if necessary.
+    if (authentication === 'bearer' && !this.token) {
+      await this.logIn()
+    }
+
     const authorizationHeader =
       authentication === 'basic'
         ? `Basic ${btoa(`${this.username}:${this.password}`)}`
@@ -95,7 +100,7 @@ export default class FileMakerDataAPISession {
       (await response.json()) as FileMakerDataAPIResponse<FileMakerDataAPIResponseData>
 
     // Check for an error message.
-    if (data.messages[0].code !== '0') {
+    if (data.messages.some((message) => message.code !== '0')) {
       throw new FileMakerDataAPIOperationException(
         'The operation was unsuccessful.',
         data.messages[0]
