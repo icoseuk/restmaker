@@ -1,4 +1,4 @@
-type InventoryItem = {
+type ProductDetailsLayoutRecord = {
   Date: string
   Category: string
   Name: string
@@ -15,4 +15,4 @@ type InventoryItem = {
   'Reorder Level': number
 }
 
-export default InventoryItem
+export default ProductDetailsLayoutRecord

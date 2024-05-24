@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
-import { afterAll, expect, test } from 'vitest'
+import { afterAll, expect, expectTypeOf, test } from 'vitest'
 import { FileMakerDataAPIClient } from '../src/index'
-import InventoryItem from './types/InventoryItem'
+import ProductDetailsLayoutRecord from './layouts/ProductDetailsLayoutRecord'
 
 const {
   VITE_RESTMAKER_VALIDATOR_USERNAME,
@@ -51,7 +51,7 @@ const createTestRecord = async () => {
       'Unit Price': '20.00',
       'Last Order': '01-01-2023',
       'Reorder Level': 1
-    } as InventoryItem
+    } as ProductDetailsLayoutRecord
   })
 }
 
@@ -76,7 +76,7 @@ test('editing a record', async () => {
     recordId: testableRecordId,
     fieldData: {
       Name: 'Test Product (edited)'
-    } as InventoryItem
+    } as ProductDetailsLayoutRecord
   })
   expect(request.modId).toBeDefined()
 })
@@ -98,6 +98,22 @@ test('getting a record', async () => {
   expect(request.data).toHaveLength(1)
 })
 
+test('getting a record in a different layout response', async () => {
+  const request = await client?.getRecord({
+    layout: 'Product Details',
+    recordId: testableRecordId,
+    layoutResponse: 'Inventory List'
+  })
+  expect(request.dataInfo).toBeDefined()
+  expect(request.data).toHaveLength(1)
+  expectTypeOf(request.data[0].fieldData).toHaveProperty('Name')
+  expectTypeOf(request.data[0].fieldData).toHaveProperty('Availability')
+  expectTypeOf(request.data[0].fieldData).toHaveProperty('Image')
+  expectTypeOf(request.data[0].fieldData).toHaveProperty('Part Number')
+  expectTypeOf(request.data[0].fieldData).toHaveProperty('Units on Hand')
+  expect(Object.entries(request.data[0].fieldData).length).toBe(5)
+})
+
 test('getting a range of records', async () => {
   for (let i = 0; i < 10; i++) {
     await createTestRecord()
@@ -109,6 +125,26 @@ test('getting a range of records', async () => {
   })
   expect(request.dataInfo).toBeDefined()
   expect(request.data.length).toBe(5)
+})
+
+test('getting a range of records in a different layout response', async () => {
+  for (let i = 0; i < 10; i++) {
+    await createTestRecord()
+  }
+  const request = await client?.getRecordRange({
+    layout: 'Product Details',
+    layoutResponse: 'Inventory List',
+    startingIndex: 1,
+    limit: 5
+  })
+  expect(request.dataInfo).toBeDefined()
+  expect(request.data.length).toBe(5)
+  expectTypeOf(request.data[0].fieldData).toHaveProperty('Name')
+  expectTypeOf(request.data[0].fieldData).toHaveProperty('Availability')
+  expectTypeOf(request.data[0].fieldData).toHaveProperty('Image')
+  expectTypeOf(request.data[0].fieldData).toHaveProperty('Part Number')
+  expectTypeOf(request.data[0].fieldData).toHaveProperty('Units on Hand')
+  expect(Object.entries(request.data[0].fieldData).length).toBe(5)
 })
 
 afterAll(async () => {
