@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1] - 2024-05-27
+
+This release includes a hot fix for the `package.json` index references.
+
+### Fixed
+
+- Corrected `package.json` index references.
+
 ## [1.0.0] - 2024-05-27
 
 Introducing the first release of RestMaker! 🎉
