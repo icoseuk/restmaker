@@ -8,7 +8,8 @@ import {
   GetRecordParameters,
   GetRecordRangeParameters,
   RequestLifecycleScriptExecution,
-  RunScriptParameters
+  RunScriptParameters,
+  UpdateContainerDataParameters
 } from '../types/FileMakerDataAPIClient/FileMakerDataAPIClientMethodParameters'
 import FileMakerDataAPIRecord from '../types/FileMakerDataAPIRecord'
 import FileMakerDataAPICreateRecordRequest from '../types/FileMakerDataAPIRequest/FileMakerDataAPICreateRecordRequest'
@@ -289,6 +290,23 @@ export default class FileMakerDataAPIClient
       }, {} as FileMakerDataAPIFindRequest<FieldData>),
       ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
     })
+  }
+
+  updateContainerData = async ({
+    layout,
+    recordId,
+    fieldName,
+    file
+  }: UpdateContainerDataParameters) => {
+    const formData = new FormData()
+    formData.append('upload', file)
+
+    return this.session.multipartRequest<
+      FileMakerDataAPIResponse<{}>['response']
+    >(
+      `/layouts/${layout}/records/${recordId}/containers/${fieldName}`,
+      formData
+    )
   }
 
   runScript = async ({

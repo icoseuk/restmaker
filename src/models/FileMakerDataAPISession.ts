@@ -60,6 +60,34 @@ export default class FileMakerDataAPISession {
   }
 
   /**
+   * Sends a multipart request to the FileMaker Data API.
+   *
+   * @param endpoint The database specific endpoint to send the request to.
+   * @param body The body of the request to send.
+   */
+  multipartRequest = async <FileMakerDataAPIResponseData>(
+    endpoint: string,
+    body: FormData
+  ) => {
+    if (!this.token) {
+      this.token = await this.open()
+    }
+    // Authenticate with the FileMaker Data API
+    const response = await fetch(
+      `https://${this.host}/fmi/data/${this.apiVersion}/databases/${this.database}${endpoint}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        },
+        body
+      }
+    )
+
+    return this.interpretJsonResponse<FileMakerDataAPIResponseData>(response)
+  }
+
+  /**
    * Sends a request to the FileMaker Data API.
    *
    * @param endpoint The database specific endpoint to send the request to.
@@ -74,15 +102,12 @@ export default class FileMakerDataAPISession {
     method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
     body: FileMakerDataAPIRequestData = {} as FileMakerDataAPIRequestData,
     authentication: 'basic' | 'bearer' = 'bearer'
-  ) => {
+  ): Promise<
+    FileMakerDataAPIResponse<FileMakerDataAPIResponseData>['response']
+  > => {
     if (authentication === 'bearer' && !this.token) {
       this.token = await this.open()
     }
-
-    const authorizationHeader =
-      authentication === 'basic'
-        ? `Basic ${btoa(`${this.username}:${this.password}`)}`
-        : `Bearer ${this.token}`
 
     // Authenticate with the FileMaker Data API
     const response = await fetch(
@@ -91,12 +116,26 @@ export default class FileMakerDataAPISession {
         method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authorizationHeader
+          Authorization:
+            authentication === 'basic'
+              ? `Basic ${btoa(`${this.username}:${this.password}`)}`
+              : `Bearer ${this.token}`
         },
         body: method === 'GET' ? undefined : JSON.stringify(body)
       }
     )
 
+    return this.interpretJsonResponse<FileMakerDataAPIResponseData>(response)
+  }
+
+  /**
+   * Interprets a JSON response from the FileMaker Data API and checks for errors.
+   *
+   * @param response The response to interpret.
+   */
+  interpretJsonResponse = async <FileMakerDataAPIResponseData>(
+    response: Response
+  ) => {
     // Parse the response JSON.
     let data: FileMakerDataAPIResponse<FileMakerDataAPIResponseData>
     try {

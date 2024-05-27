@@ -291,3 +291,25 @@ export type RunScriptParameters = {
    */
   scriptParameter?: string
 }
+
+export type UpdateContainerDataParameters = {
+  /**
+   * The layout to update the container data in.
+   */
+  layout: string
+
+  /**
+   * The record ID to update the container data for.
+   */
+  recordId: string
+
+  /**
+   * The field name to update the container data for.
+   */
+  fieldName: string
+
+  /**
+   * The file to upload.
+   */
+  file: File
+}

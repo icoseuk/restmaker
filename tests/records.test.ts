@@ -3,6 +3,7 @@ import { afterAll, expect, expectTypeOf, test } from 'vitest'
 import { FileMakerDataAPIClient } from '../src/index'
 import ProductDetailsLayoutRecord from './layouts/ProductDetailsLayoutRecord'
 import { createTestRecord } from './lib/helpers'
+import { promises as fs } from 'fs'
 
 const {
   VITE_RESTMAKER_VALIDATOR_USERNAME,
@@ -186,6 +187,20 @@ test("finding a range of records that don't exist", async () => {
         limit: 5
       })
   ).rejects.toThrow()
+})
+
+test('updating the container in a record', async () => {
+  expect(async () => {
+    const buffer = await fs.readFile(`${__dirname}/lib/sample.jpeg`)
+    const file = new File([buffer], 'sample.jpeg', { type: 'image/jpg' })
+
+    await client.updateContainerData({
+      layout: 'Product Details',
+      recordId: testableRecordId,
+      fieldName: 'Imageads',
+      file
+    })
+  }).not.toThrow()
 })
 
 afterAll(async () => {

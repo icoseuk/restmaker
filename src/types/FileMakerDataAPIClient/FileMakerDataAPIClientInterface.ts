@@ -6,7 +6,8 @@ import {
   FindParameters,
   GetRecordParameters,
   GetRecordRangeParameters,
-  RunScriptParameters
+  RunScriptParameters,
+  UpdateContainerDataParameters
 } from './FileMakerDataAPIClientMethodParameters'
 import FileMakerDataAPIRecord from '../FileMakerDataAPIRecord'
 import FileMakerDataAPICreateRecordResponse from '../FileMakerDataAPIResponse/FileMakerDataAPICreateRecordResponse'
@@ -90,6 +91,13 @@ interface FileMakerDataAPIClientInterface {
   >(
     params: FindParameters<FieldData>
   ): Promise<FileMakerDataAPIGetRecordResponse<FieldData, PortalData>>
+
+  /**
+   * Update the data in a container field.
+   */
+  updateContainerData(
+    params: UpdateContainerDataParameters
+  ): Promise<FileMakerDataAPIResponse['response']>
 
   /**
    * Execute a script in the specified layout.
