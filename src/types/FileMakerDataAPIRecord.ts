@@ -23,7 +23,7 @@ type FileMakerDataAPIRecord<
   /**
    * The portal data.
    */
-  portalData: Record<string, Array<PortalData>>
+  portalData: Record<keyof PortalData, Array<PortalData[keyof PortalData]>>
 }
 
 export default FileMakerDataAPIRecord

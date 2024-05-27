@@ -85,7 +85,10 @@ export type EditRecordParameters<
   /**
    * The portal data to set in the record.
    */
-  portalData?: PortalData
+  portalData?: Record<
+    keyof PortalData,
+    Array<PortalData[keyof PortalData] & { recordId: string; modId?: string }>
+  >
 
   /**
    * The related record to delete. The format is `portalName.portalRowId`.

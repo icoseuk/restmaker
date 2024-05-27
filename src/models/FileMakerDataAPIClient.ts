@@ -46,13 +46,19 @@ export default class FileMakerDataAPIClient
    * @param database The FileMaker database to use.
    * @param apiVersion The version of the FileMaker Data API to use.
    */
-  constructor(
-    username: string,
-    password: string,
-    host: string,
-    database: string,
-    apiVersion: FileMakerDataAPIVersion = 'vLatest'
-  ) {
+  constructor({
+    username,
+    password,
+    host,
+    database,
+    apiVersion
+  }: {
+    username: string
+    password: string
+    host: string
+    database: string
+    apiVersion?: FileMakerDataAPIVersion
+  }) {
     this.session = new FileMakerDataAPISession(
       username,
       password,

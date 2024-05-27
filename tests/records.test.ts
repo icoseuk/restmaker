@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import { afterAll, expect, expectTypeOf, test } from 'vitest'
-import { FileMakerDataAPIClient } from '../src/index'
+import { RestMaker } from '../src/index'
 import ProductDetailsLayoutRecord from './layouts/ProductDetailsLayoutRecord'
 import { createTestRecord } from './lib/helpers'
 import { promises as fs } from 'fs'
@@ -15,12 +15,12 @@ const {
 /**
  * The FileMaker Data API session to use for testing.
  */
-let client: FileMakerDataAPIClient | null = new FileMakerDataAPIClient(
-  VITE_RESTMAKER_VALIDATOR_USERNAME,
-  VITE_RESTMAKER_VALIDATOR_PASSWORD,
-  VITE_RESTMAKER_VALIDATOR_HOST,
-  VITE_RESTMAKER_VALIDATOR_DATABASE
-)
+let client: RestMaker | null = new RestMaker({
+  username: VITE_RESTMAKER_VALIDATOR_USERNAME,
+  password: VITE_RESTMAKER_VALIDATOR_PASSWORD,
+  host: VITE_RESTMAKER_VALIDATOR_HOST,
+  database: VITE_RESTMAKER_VALIDATOR_DATABASE
+})
 
 /**
  * The record ID to use for testing.
