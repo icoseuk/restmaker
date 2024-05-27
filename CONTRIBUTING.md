@@ -55,7 +55,7 @@ The Dev Container set up takes care of the initial dependency installation upon 
 
 ### Branching Strategy
 
-This repository is branched based on the the corresponding Jira project issue keys. For example, if you are working on an issue with the key `RM-1`, you should create a branch named `RM-1` from the `main` branch. Once you are done with the changes, you can create a pull request to merge your changes back to the `main` branch.
+This repository is branched based on the the corresponding GitHub issue keys. For example, if you are working on an issue with the key `RM-1`, you should create a branch named `RM-1` from the `main` branch. Once you are done with the changes, you can create a pull request to merge your changes back to the `main` branch.
 
 ### Commit Messages
 
