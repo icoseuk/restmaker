@@ -34,3 +34,6 @@ jobs:
 
       - name: 🧪 Test FileMaker CRUD Functionality
         run: npm run test:crud
+
+      - name: 🧪 Test FileMaker Scripts Functionality
+        run: npm run test:scripts
