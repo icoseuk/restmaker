@@ -1,3 +1,4 @@
+import FileMakerDataAPIClientInterface from '../types/FileMakerDataAPIClient/FileMakerDataAPIClientInterface'
 import {
   CreateRecordParameters,
   DeleteRecordParameters,
@@ -5,8 +6,10 @@ import {
   EditRecordParameters,
   FindParameters,
   GetRecordParameters,
-  GetRecordRangeParameters
-} from '../types/FileMakerDataAPIClientMethodParameters'
+  GetRecordRangeParameters,
+  RequestLifecycleScriptExecution,
+  RunScriptParameters
+} from '../types/FileMakerDataAPIClient/FileMakerDataAPIClientMethodParameters'
 import FileMakerDataAPIRecord from '../types/FileMakerDataAPIRecord'
 import FileMakerDataAPICreateRecordRequest from '../types/FileMakerDataAPIRequest/FileMakerDataAPICreateRecordRequest'
 import FileMakerDataAPIFindRequest from '../types/FileMakerDataAPIRequest/FileMakerDataAPIFindRequest'
@@ -18,13 +21,16 @@ import FileMakerDataAPIDuplicateRecordResponse from '../types/FileMakerDataAPIRe
 import FileMakerDataAPIEditRecordResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIEditRecordResponse'
 import FileMakerDataAPIGetRecordResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIGetRecordResponse'
 import FileMakerDataAPIResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIResponse'
+import FileMakerDataAPIRunScriptResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIRunScriptResponse'
 import FileMakerDataAPIVersion from '../types/FileMakerDataAPIVersion'
 import FileMakerDataAPISession from './FileMakerDataAPISession'
 
 /**
  * A class that provides a client for the FileMaker Data API.
  */
-export default class FileMakerDataAPIClient {
+export default class FileMakerDataAPIClient
+  implements FileMakerDataAPIClientInterface
+{
   /**
    * The FileMaker Data API session.
    */
@@ -55,37 +61,54 @@ export default class FileMakerDataAPIClient {
     )
   }
 
-  /**
-   * Log in explicitly to the FileMaker Data API.
-   */
-  logIn = async () => this.session.logIn()
+  logIn = async () => {
+    await this.session.open()
+  }
+
+  logOut = async () => {
+    await this.session.close()
+  }
 
   /**
-   * Log out explicitly from the FileMaker Data API session.
+   * Parses the script execution parameters into the compatible query object.
    */
-  logOut = async () => this.session.logOut()
+  protected parseScriptRequest = ({
+    script,
+    prerequestScript,
+    presortScript
+  }: RequestLifecycleScriptExecution): FileMakerDataAPIRequest<{}> => {
+    const query = {
+      script: script?.name,
+      'script.param': script?.param,
+      'script.prerequest': prerequestScript?.name,
+      'script.prerequest.param': prerequestScript?.param,
+      'script.presort': presortScript?.name,
+      'script.presort.param': presortScript?.param
+    }
 
-  /**
-   * Creates a new record in the specified layout.
-   */
+    // Remove undefined values from the query object.
+    return Object.fromEntries(
+      Object.entries(query).filter(([_, value]) => value !== undefined)
+    )
+  }
+
   createRecord = async <
     FieldData extends
       FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData']
   >({
     layout,
-    fieldData
+    fieldData,
+    ...scriptParams
   }: CreateRecordParameters<FieldData>) => {
     return this.session.request<
       FileMakerDataAPICreateRecordResponse,
       FileMakerDataAPICreateRecordRequest<FieldData>
     >(`/layouts/${layout}/records`, 'POST', {
-      fieldData
+      fieldData,
+      ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
     })
   }
 
-  /**
-   * Edits a record in the specified layout.
-   */
   editRecord = async <
     FieldData extends
       FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData'],
@@ -96,7 +119,8 @@ export default class FileMakerDataAPIClient {
     recordId,
     fieldData,
     portalData,
-    deleteRelated
+    deleteRelated,
+    ...scriptParams
   }: EditRecordParameters<FieldData, PortalData>) => {
     return this.session.request<FileMakerDataAPIEditRecordResponse>(
       `/layouts/${layout}/records/${recordId}`,
@@ -104,48 +128,39 @@ export default class FileMakerDataAPIClient {
       {
         fieldData,
         portalData,
-        deleteRelated
+        deleteRelated,
+        ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
       }
     )
   }
 
-  /**
-   * Duplicate a record in the specified layout.
-   *
-   * @param layout The layout to duplicate the record in.
-   * @param recordId The ID of the record to duplicate.
-   * @returns The response from the FileMaker Data API.
-   */
-  duplicateRecord = async ({ layout, recordId }: DuplicateRecordParameters) => {
+  duplicateRecord = async ({
+    layout,
+    recordId,
+    ...scriptParams
+  }: DuplicateRecordParameters) => {
     return this.session.request<
       FileMakerDataAPIDuplicateRecordResponse,
       FileMakerDataAPIRequest
-    >(`/layouts/${layout}/records/${recordId}`, 'POST')
+    >(`/layouts/${layout}/records/${recordId}`, 'POST', {
+      ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
+    })
   }
 
-  /**
-   * Deletes a record in the specified layout.
-   *
-   * @param layout The layout to delete the record in.
-   * @param recordId The ID of the record to delete.
-   * @returns The response from the FileMaker Data API.
-   */
-  deleteRecord = async ({ layout, recordId }: DeleteRecordParameters) => {
+  deleteRecord = async ({
+    layout,
+    recordId,
+    ...scriptParams
+  }: DeleteRecordParameters) => {
+    const urlParams = new URLSearchParams(
+      scriptParams ? this.parseScriptRequest(scriptParams) : {}
+    )
     return this.session.request<
       FileMakerDataAPIResponse,
       FileMakerDataAPIRequest
-    >(`/layouts/${layout}/records/${recordId}`, 'DELETE')
+    >(`/layouts/${layout}/records/${recordId}/?${urlParams}`, 'DELETE')
   }
 
-  /**
-   * Get a single record in the specified layout.
-   *
-   * @param layout The layout to get the record from.
-   * @param recordId The ID of the record to get.
-   * @param layoutResponse The layout to return the response from.
-   * @param portals The portals to include in the response.
-   * @returns The response from the FileMaker Data API.
-   */
   getRecord = async <
     FieldData extends
       FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData'],
@@ -155,7 +170,8 @@ export default class FileMakerDataAPIClient {
     layout,
     recordId,
     layoutResponse,
-    portals = []
+    portals = [],
+    ...scriptParams
   }: GetRecordParameters) => {
     // Build the query object.
     const query: FileMakerDataAPIGetRecordQueryRequest = {
@@ -176,7 +192,10 @@ export default class FileMakerDataAPIClient {
     )
 
     // Convert the query object to a query string.
-    const queryString = new URLSearchParams(cleanedQuery).toString()
+    const queryString = new URLSearchParams({
+      ...cleanedQuery,
+      ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
+    }).toString()
 
     // Make the request to the FileMaker Data API.
     return this.session.request<
@@ -185,17 +204,6 @@ export default class FileMakerDataAPIClient {
     >(`/layouts/${layout}/records/${recordId}?${queryString}`, 'GET')
   }
 
-  /**
-   * Get a range of records in the specified layout.
-   *
-   * @param layout The layout to get the records from.
-   * @param startingIndex The ID of the record to start from.
-   * @param limit The maximum number of records to return.
-   * @param layoutResponse The layout to return the response from.
-   * @param portals The portals to include in the response.
-   * @param sort The sort order to use.
-   * @returns The response from the FileMaker Data API.
-   */
   getRecordRange = async <
     FieldData extends
       FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData'],
@@ -207,7 +215,8 @@ export default class FileMakerDataAPIClient {
     limit,
     layoutResponse,
     portals = [],
-    sort = []
+    sort = [],
+    ...scriptParams
   }: GetRecordRangeParameters) => {
     // Build the query object.
     const query: FileMakerDataAPIGetRecordRangeRequest = {
@@ -231,7 +240,10 @@ export default class FileMakerDataAPIClient {
     )
 
     // Convert the query object to a query string.
-    const queryString = new URLSearchParams(cleanedQuery).toString()
+    const queryString = new URLSearchParams({
+      ...cleanedQuery,
+      ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
+    }).toString()
 
     // Make the request to the FileMaker Data API.
     return this.session.request<
@@ -241,8 +253,6 @@ export default class FileMakerDataAPIClient {
   }
 
   /**
-   * Find records in the specified layout.
-   *
    * @throws {FileMakerDataAPIOperationException} If no records are found.
    */
   find = async <
@@ -254,8 +264,10 @@ export default class FileMakerDataAPIClient {
     layout,
     query,
     sort,
+    limit = 100,
     portals,
-    layoutResponse
+    layoutResponse,
+    ...scriptParams
   }: FindParameters<FieldData>) => {
     return this.session.request<
       FileMakerDataAPIGetRecordResponse<FieldData, PortalData>,
@@ -267,13 +279,31 @@ export default class FileMakerDataAPIClient {
           omit: parameters.omit ? 'true' : undefined
         }
       }),
+      limit: limit.toString(),
       sort,
       'layout.response': layoutResponse,
       ...portals?.reduce((acc, { name, limit, offset }) => {
         acc[`offset.${name}`] = offset.toString()
         acc[`limit.${name}`] = limit.toString()
         return acc
-      }, {} as FileMakerDataAPIFindRequest<FieldData>)
+      }, {} as FileMakerDataAPIFindRequest<FieldData>),
+      ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
     })
+  }
+
+  runScript = async ({
+    layout,
+    scriptName,
+    scriptParameter
+  }: RunScriptParameters) => {
+    const urlScriptParameter = scriptParameter
+      ? new URLSearchParams({
+          'script.param': scriptParameter
+        })
+      : ''
+    return this.session.request<FileMakerDataAPIRunScriptResponse>(
+      `/layouts/${layout}/script/${encodeURIComponent(scriptName)}?${urlScriptParameter}`,
+      'GET'
+    )
   }
 }

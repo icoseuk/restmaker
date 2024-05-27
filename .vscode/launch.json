@@ -21,6 +21,12 @@
       "name": "Watch Records Tests",
       "request": "launch",
       "type": "node-terminal"
+    },
+    {
+      "command": "npm run test:scripts",
+      "name": "Watch Scripts Tests",
+      "request": "launch",
+      "type": "node-terminal"
     }
   ]
 }

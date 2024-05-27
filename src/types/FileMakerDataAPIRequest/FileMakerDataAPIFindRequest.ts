@@ -35,6 +35,11 @@ type FileMakerDataAPIFindRequest<FieldData> = {
   portal?: PortalName[]
 
   /**
+   * The maximum number of records to return.
+   */
+  limit?: string
+
+  /**
    * The layout to return the response from.
    */
   'layout.response'?: string

@@ -76,7 +76,7 @@ export default class FileMakerDataAPISession {
     authentication: 'basic' | 'bearer' = 'bearer'
   ) => {
     if (authentication === 'bearer' && !this.token) {
-      this.token = await this.logIn()
+      this.token = await this.open()
     }
 
     const authorizationHeader =
@@ -98,8 +98,23 @@ export default class FileMakerDataAPISession {
     )
 
     // Parse the response JSON.
-    const data =
-      (await response.json()) as FileMakerDataAPIResponse<FileMakerDataAPIResponseData>
+    let data: FileMakerDataAPIResponse<FileMakerDataAPIResponseData>
+    try {
+      data =
+        (await response.json()) as FileMakerDataAPIResponse<FileMakerDataAPIResponseData>
+    } catch (error) {
+      if (!response.ok) {
+        throw new FileMakerDataAPIOperationException(
+          'The operation was unsuccessful.',
+          {
+            code: response.status.toString(),
+            message: response.statusText
+          }
+        )
+      } else {
+        throw error
+      }
+    }
 
     // Check for an error message.
     data.messages.forEach((message) => {
@@ -123,7 +138,7 @@ export default class FileMakerDataAPISession {
    * @throws {FileMakerDataAPIHTTPException} If an error occurs while interacting with the FileMaker Data API.
    * @throws {FileMakerDataAPIOperationException} If an error occurs while interacting with the FileMaker Data API.
    */
-  logIn = async () => {
+  open = async () => {
     const response = await this.request<{ token: string }>(
       '/sessions',
       'POST',
@@ -143,7 +158,7 @@ export default class FileMakerDataAPISession {
    * @throws {FileMakerDataAPIHTTPException} If an error occurs while interacting with the FileMaker Data API.
    * @throws {FileMakerDataAPIOperationException} If an error occurs while interacting with the FileMaker Data API.
    */
-  logOut = async () => {
+  close = async () => {
     if (!this.token) return
     await this.request(`/sessions/${this.token}`, 'DELETE')
     this.token = undefined

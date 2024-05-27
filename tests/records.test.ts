@@ -3,7 +3,6 @@ import { afterAll, expect, expectTypeOf, test } from 'vitest'
 import { FileMakerDataAPIClient } from '../src/index'
 import ProductDetailsLayoutRecord from './layouts/ProductDetailsLayoutRecord'
 import { createTestRecord } from './lib/helpers'
-import FileMakerDataAPIOperationException from '../src/exceptions/FileMakerDataAPIOperationException'
 
 const {
   VITE_RESTMAKER_VALIDATOR_USERNAME,
@@ -147,6 +146,32 @@ test('finding a range of records that exist', async () => {
   expect(request.data.length).greaterThan(1)
 })
 
+test('finding and sorting range of 5 records', async () => {
+  const request = await client?.find<ProductDetailsLayoutRecord>({
+    layout: 'Product Details',
+    query: [
+      {
+        Name: 'Test Product'
+      },
+      {
+        'Model Year': 2023
+      }
+    ],
+    sort: [
+      {
+        fieldName: 'Name',
+        sortOrder: 'ascend'
+      }
+    ],
+    limit: 5
+  })
+  expect(request.dataInfo).toBeDefined()
+  expect(request.data.length).greaterThan(1)
+  const names = request.data.map((record) => record.fieldData.Name)
+  expect(names).toEqual(names.sort())
+  expect(names.length).toBe(5)
+})
+
 test("finding a range of records that don't exist", async () => {
   await expect(
     async () =>
@@ -156,12 +181,6 @@ test("finding a range of records that don't exist", async () => {
           {
             'Model Year': 2023,
             omit: true
-          }
-        ],
-        sort: [
-          {
-            fieldName: 'Name',
-            sortOrder: 'ascend'
           }
         ],
         limit: 5
