@@ -19,6 +19,7 @@ A TypeScript utility to connect to the FileMaker Data API (REST) seamlessly.
     - [Running a script in a request](#running-a-script-in-a-request)
     - [Running a script standalone](#running-a-script-standalone)
 - [Contributing](#contributing)
+- [License](#license)
 
 ## Getting Started
 
@@ -237,6 +238,7 @@ const result = await restMaker.runScript({
   scriptName: 'your-script',
   scriptParameter: 'your-param'
 })
+```
 
 ## Contributing
 
@@ -245,4 +247,3 @@ Check out the [Contributing Guidelines](CONTRIBUTING.md) to get started on contr
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-```
