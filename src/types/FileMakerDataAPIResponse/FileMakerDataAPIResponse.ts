@@ -16,7 +16,37 @@ type FileMakerDataAPIResponse<
   /**
    * The response data.
    */
-  response: FileMakerDataAPIResponseData
+  response: FileMakerDataAPIResponseData & {
+    /**
+     * The error code from the request script execution.
+     */
+    scriptError?: string
+
+    /**
+     * The error code from the prerequest script execution.
+     */
+    'scriptError.prerequest'?: string
+
+    /**
+     * The error code from the presort script execution.
+     */
+    'scriptError.presort'?: string
+
+    /**
+     * The result from the request script execution.
+     */
+    scriptResult?: string
+
+    /**
+     * The result from the presort script execution.
+     */
+    'scriptResult.prerequest'?: string
+
+    /**
+     * The result from the presort script execution.
+     */
+    'scriptResult.presort'?: string
+  }
 }
 
 export default FileMakerDataAPIResponse

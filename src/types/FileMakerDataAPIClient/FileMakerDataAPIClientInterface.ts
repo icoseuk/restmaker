@@ -59,7 +59,7 @@ interface FileMakerDataAPIClientInterface {
    */
   deleteRecord(
     params: DeleteRecordParameters
-  ): Promise<FileMakerDataAPIResponse>
+  ): Promise<FileMakerDataAPIResponse['response']>
 
   /**
    * Get a single record in the specified layout.

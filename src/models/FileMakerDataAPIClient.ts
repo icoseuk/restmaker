@@ -156,7 +156,7 @@ export default class FileMakerDataAPIClient
       scriptParams ? this.parseScriptRequest(scriptParams) : {}
     )
     return this.session.request<
-      FileMakerDataAPIResponse,
+      FileMakerDataAPIResponse['response'],
       FileMakerDataAPIRequest
     >(`/layouts/${layout}/records/${recordId}/?${urlParams}`, 'DELETE')
   }

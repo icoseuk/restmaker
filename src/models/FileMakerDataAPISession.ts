@@ -127,7 +127,7 @@ export default class FileMakerDataAPISession {
     })
 
     // Return the response.
-    return data.response as FileMakerDataAPIResponseData
+    return data.response as FileMakerDataAPIResponse<FileMakerDataAPIResponseData>['response']
   }
 
   /**
