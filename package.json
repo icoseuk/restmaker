@@ -10,8 +10,8 @@
     "rest",
     "typescript"
   ],
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test:all": "vitest --reporter=verbose",
     "test:auth": "vitest --reporter=verbose authentication.test.ts",
