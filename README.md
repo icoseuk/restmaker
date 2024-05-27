@@ -9,6 +9,7 @@ A TypeScript utility to connect to the FileMaker Data API (REST) seamlessly.
 - [Getting Started](#getting-started)
   - [Installation](#installation)
   - [Usage](#usage)
+    - [Session management](#session-management)
     - [Creating a record](#creating-a-record)
     - [Editing a record](#editing-a-record)
     - [Duplicate a record](#duplicate-a-record)
@@ -45,6 +46,18 @@ const restMaker = new RestMaker({
 ```
 
 Take a look at the methods below to see how you can interact with the FileMaker Data API.
+
+#### Session management
+
+RestMaker will automatically manage the session for you, so if a session token times out it will attempt to start a new session. You can also manually manage the session by calling the `logIn` and `logOut` methods:
+
+```typescript
+// Log in
+await restMaker.logIn()
+
+// Log out
+await restMaker.logOut()
+```
 
 #### Creating a record
 

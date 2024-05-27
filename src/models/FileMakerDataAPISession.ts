@@ -73,7 +73,7 @@ export default class FileMakerDataAPISession {
       this.token = await this.open()
     }
     // Authenticate with the FileMaker Data API
-    const response = await fetch(
+    const response = await this.attemptRequest(
       `https://${this.host}/fmi/data/${this.apiVersion}/databases/${this.database}${endpoint}`,
       {
         method: 'POST',
@@ -110,7 +110,7 @@ export default class FileMakerDataAPISession {
     }
 
     // Authenticate with the FileMaker Data API
-    const response = await fetch(
+    const response = await this.attemptRequest(
       `https://${this.host}/fmi/data/${this.apiVersion}/databases/${this.database}${endpoint}`,
       {
         method,
@@ -126,6 +126,39 @@ export default class FileMakerDataAPISession {
     )
 
     return this.interpretJsonResponse<FileMakerDataAPIResponseData>(response)
+  }
+
+  /**
+   * Attempts a request to the FileMaker Data API, and re-authenticates if necessary.
+   *
+   * @param input The input for the request.
+   * @param init The init for the request.
+   *
+   * @returns The response from the request.
+   */
+  attemptRequest = async (
+    input: string | URL | globalThis.Request,
+    init?: RequestInit
+  ) => {
+    let response = await fetch(input, init)
+
+    if (response.status === 401) {
+      // If the response is unauthorized, re-authenticate and try again.
+      this.token = await this.open()
+      response = await fetch(input, init)
+
+      if (response.status === 401) {
+        throw new FileMakerDataAPIOperationException(
+          'The provded credentials are incorrect.',
+          {
+            code: response.status.toString(),
+            message: response.statusText
+          }
+        )
+      }
+    }
+
+    return response
   }
 
   /**
