@@ -1,6 +1,6 @@
 {
   "name": "@icose/restmaker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A TypeScript utility to connect to the FileMaker Data API (REST) seamlessly.",
   "keywords": [
     "filemaker",
