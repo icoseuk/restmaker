@@ -29,7 +29,7 @@ export default class FileMakerDataAPISession {
   /**
    * The token to use for authentication.
    */
-  private token?: string
+  private static token?: string
 
   /**
    * The version of the FileMaker Data API to use.
@@ -69,16 +69,16 @@ export default class FileMakerDataAPISession {
     endpoint: string,
     body: FormData
   ) => {
-    if (!this.token) {
-      this.token = await this.open()
-    }
+    // Ensure the session is open.
+    await this.open()
+
     // Authenticate with the FileMaker Data API
-    const response = await this.attemptRequest(
+    const response = await fetch(
       `https://${this.host}/fmi/data/${this.apiVersion}/databases/${this.database}${endpoint}`,
       {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${this.token}`
+          Authorization: `Bearer ${FileMakerDataAPISession.token}`
         },
         body
       }
@@ -105,12 +105,11 @@ export default class FileMakerDataAPISession {
   ): Promise<
     FileMakerDataAPIResponse<FileMakerDataAPIResponseData>['response']
   > => {
-    if (authentication === 'bearer' && !this.token) {
-      this.token = await this.open()
-    }
+    // Ensure the session is open.
+    if (authentication === 'bearer') await this.open()
 
     // Authenticate with the FileMaker Data API
-    const response = await this.attemptRequest(
+    const response = await fetch(
       `https://${this.host}/fmi/data/${this.apiVersion}/databases/${this.database}${endpoint}`,
       {
         method,
@@ -119,7 +118,7 @@ export default class FileMakerDataAPISession {
           Authorization:
             authentication === 'basic'
               ? `Basic ${btoa(`${this.username}:${this.password}`)}`
-              : `Bearer ${this.token}`
+              : `Bearer ${FileMakerDataAPISession.token}`
         },
         body: method === 'GET' ? undefined : JSON.stringify(body)
       }
@@ -129,37 +128,23 @@ export default class FileMakerDataAPISession {
   }
 
   /**
-   * Attempts a request to the FileMaker Data API, and re-authenticates if necessary.
+   * Sends a request to the FileMaker Data API to validate a session token.
    *
-   * @param input The input for the request.
-   * @param init The init for the request.
+   * @param token The session token to validate.
    *
    * @returns The response from the request.
    */
-  attemptRequest = async (
-    input: string | URL | globalThis.Request,
-    init?: RequestInit
-  ) => {
-    let response = await fetch(input, init)
-
-    if (response.status === 401) {
-      // If the response is unauthorized, re-authenticate and try again.
-      this.token = await this.open()
-      response = await fetch(input, init)
-
-      if (response.status === 401) {
-        throw new FileMakerDataAPIOperationException(
-          'The provded credentials are incorrect.',
-          {
-            code: response.status.toString(),
-            message: response.statusText
-          }
-        )
+  validateSession = async () =>
+    await fetch(
+      `https://${this.host}/fmi/data/${this.apiVersion}/validateSession`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${FileMakerDataAPISession.token}`
+        }
       }
-    }
-
-    return response
-  }
+    )
 
   /**
    * Interprets a JSON response from the FileMaker Data API and checks for errors.
@@ -210,14 +195,35 @@ export default class FileMakerDataAPISession {
    * @throws {FileMakerDataAPIHTTPException} If an error occurs while interacting with the FileMaker Data API.
    * @throws {FileMakerDataAPIOperationException} If an error occurs while interacting with the FileMaker Data API.
    */
-  open = async () => {
+  open = async (): Promise<boolean> => {
+    if (FileMakerDataAPISession.token === undefined) {
+      // Start a new session.
+      FileMakerDataAPISession.token = await this.create()
+      return true
+    } else {
+      // Validate if the current session has not expired.
+      const sessionValidationResponse = await this.validateSession()
+      if (sessionValidationResponse.status === 401) {
+        FileMakerDataAPISession.token = await this.create()
+        return true
+      }
+    }
+    return false
+  }
+
+  /**
+   * Creates a new session with the FileMaker Data API.
+   *
+   * This method sends a request to the FileMaker Data API to create a new session.
+   */
+  create = async () => {
     const response = await this.request<{ token: string }>(
       '/sessions',
       'POST',
       {},
       'basic'
     )
-    this.token = response.token
+    FileMakerDataAPISession.token = response.token
     return response.token
   }
 
@@ -231,8 +237,12 @@ export default class FileMakerDataAPISession {
    * @throws {FileMakerDataAPIOperationException} If an error occurs while interacting with the FileMaker Data API.
    */
   close = async () => {
-    if (!this.token) return
-    await this.request(`/sessions/${this.token}`, 'DELETE')
-    this.token = undefined
+    if (!FileMakerDataAPISession.token) return
+
+    // End the session.
+    await this.request(`/sessions/${FileMakerDataAPISession.token}`, 'DELETE')
+
+    // Clear the session token.
+    FileMakerDataAPISession.token = undefined
   }
 }
