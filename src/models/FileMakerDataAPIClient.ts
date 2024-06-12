@@ -70,10 +70,16 @@ export default class FileMakerDataAPIClient
     )
   }
 
+  /**
+   * Log in to a new FileMaker Data API session.
+   */
   logIn = async () => {
     await this.session.open()
   }
 
+  /**
+   * Log out from the FileMaker Data API session.
+   */
   logOut = async () => {
     await this.session.close()
   }

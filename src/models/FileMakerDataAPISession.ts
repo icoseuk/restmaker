@@ -52,7 +52,13 @@ export default class FileMakerDataAPISession {
     database: string,
     apiVersion: FileMakerDataAPIVersion = 'vLatest'
   ) {
-    this.host = host
+    // Check if the host starts with http:// or https://, if not, prepend https://
+    // This forces the host to be a valid and secure URL.
+    if (!host.startsWith('http://') && !host.startsWith('https://')) {
+      this.host = `https://${host}`
+    } else {
+      this.host = host
+    }
     this.database = database
     this.username = username
     this.password = password
@@ -74,7 +80,7 @@ export default class FileMakerDataAPISession {
 
     // Authenticate with the FileMaker Data API
     const response = await fetch(
-      `https://${this.host}/fmi/data/${this.apiVersion}/databases/${this.database}${endpoint}`,
+      `${this.host}/fmi/data/${this.apiVersion}/databases/${this.database}${endpoint}`,
       {
         method: 'POST',
         headers: {
@@ -110,7 +116,7 @@ export default class FileMakerDataAPISession {
 
     // Authenticate with the FileMaker Data API
     const response = await fetch(
-      `https://${this.host}/fmi/data/${this.apiVersion}/databases/${this.database}${endpoint}`,
+      `${this.host}/fmi/data/${this.apiVersion}/databases/${this.database}${endpoint}`,
       {
         method,
         headers: {
@@ -135,16 +141,13 @@ export default class FileMakerDataAPISession {
    * @returns The response from the request.
    */
   validateSession = async () =>
-    await fetch(
-      `https://${this.host}/fmi/data/${this.apiVersion}/validateSession`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${FileMakerDataAPISession.token}`
-        }
+    await fetch(`${this.host}/fmi/data/${this.apiVersion}/validateSession`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${FileMakerDataAPISession.token}`
       }
-    )
+    })
 
   /**
    * Interprets a JSON response from the FileMaker Data API and checks for errors.
