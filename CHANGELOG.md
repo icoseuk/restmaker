@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0] - 2024-06-12
+
+This release includes small DX improvements and a bug fix.
+
+### Added
+
+- Added support for `http` and `https` protocols in the client hostname.
+
+### Fixed
+
+- Added explicit export for the `FileMakerDataAPIRecord` type.
+
 ## [1.1.1] - 2024-06-12
 
 This release includes an important fix to type definitions, and CI/CD improvements.
