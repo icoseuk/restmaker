@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.2] - 2024-06-12
+
+This release includes a fix regarding retrieving protals.
+
+### Fixed
+
+- Portal offsets and limits are now optional.
+
 ## [1.2.1] - 2024-06-12
 
 This release includes the ability to set an `offset` during finds.

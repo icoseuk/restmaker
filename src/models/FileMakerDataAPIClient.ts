@@ -191,8 +191,8 @@ export default class FileMakerDataAPIClient
     // Build the query object.
     const query: FileMakerDataAPIGetRecordQueryRequest = {
       ...portals.reduce((acc, { name, limit, offset }) => {
-        acc[`_offset.${name}`] = offset.toString()
-        acc[`_limit.${name}`] = limit.toString()
+        if (offset) acc[`_offset.${name}`] = offset.toString()
+        if (limit) acc[`_limit.${name}`] = limit.toString()
         return acc
       }, {} as FileMakerDataAPIGetRecordQueryRequest),
       'layout.response': layoutResponse,
@@ -236,8 +236,8 @@ export default class FileMakerDataAPIClient
     // Build the query object.
     const query: FileMakerDataAPIGetRecordRangeRequest = {
       ...portals.reduce((acc, { name, limit, offset }) => {
-        acc[`_offset.${name}`] = offset.toString()
-        acc[`_limit.${name}`] = limit.toString()
+        if (offset) acc[`_offset.${name}`] = offset.toString()
+        if (limit) acc[`_limit.${name}`] = limit.toString()
         return acc
       }, {} as FileMakerDataAPIGetRecordQueryRequest),
       'layout.response': layoutResponse,
@@ -295,13 +295,13 @@ export default class FileMakerDataAPIClient
           omit: parameters.omit ? 'true' : undefined
         }
       }),
-      limit: limit.toString(),
+      limit: limit?.toString(),
       offset: offset?.toString(),
       sort,
       'layout.response': layoutResponse,
       ...portals?.reduce((acc, { name, limit, offset }) => {
-        acc[`offset.${name}`] = offset.toString()
-        acc[`limit.${name}`] = limit.toString()
+        if (offset) acc[`offset.${name}`] = offset.toString()
+        if (limit) acc[`limit.${name}`] = limit.toString()
         return acc
       }, {} as FileMakerDataAPIFindRequest<FieldData>),
       ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})

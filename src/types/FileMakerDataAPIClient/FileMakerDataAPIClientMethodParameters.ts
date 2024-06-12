@@ -165,12 +165,12 @@ export type GetRecordParameters = {
     /**
      * The limit of the portal records.
      */
-    limit: number
+    limit?: number
 
     /**
      * The offset of the portal records.
      */
-    offset: number
+    offset?: number
   }[]
 } & RequestLifecycleScriptExecution
 
@@ -210,12 +210,12 @@ export type GetRecordRangeParameters = {
     /**
      * The limit of the portal records.
      */
-    limit: number
+    limit?: number
 
     /**
      * The offset of the portal records.
      */
-    offset: number
+    offset?: number
   }[]
 
   /**
@@ -282,12 +282,12 @@ export type FindParameters<FieldData extends Record<string, unknown>> = {
     /**
      * The limit of the portal records.
      */
-    limit: number
+    limit?: number
 
     /**
      * The offset of the portal records.
      */
-    offset: number
+    offset?: number
   }[]
 
   /**
