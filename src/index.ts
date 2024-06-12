@@ -15,6 +15,7 @@ export { default as RestMaker } from './models/FileMakerDataAPIClient'
 export { default as FileMakerDataAPIHTTPCode } from './types/FileMakerDataAPIHTTPCode'
 export { default as FileMakerDataAPIVersion } from './types/FileMakerDataAPIVersion'
 export { default as FileMakerOperationStatus } from './types/FileMakerOperationStatus'
+export { default as FileMakerDataAPIRecord } from './types/FileMakerDataAPIRecord'
 
 // Export response type definitions.
 export { default as FileMakerDataAPIResponse } from './types/FileMakerDataAPIResponse/FileMakerDataAPIResponse'
