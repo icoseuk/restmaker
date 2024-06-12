@@ -246,17 +246,24 @@ export type FindParameters<FieldData extends Record<string, unknown>> = {
   /**
    * The query to search for.
    */
-  query: { omit?: boolean } & {
-    /**
-     * The field to search in.
-     */
-    [k in keyof Partial<FieldData>]: FieldData[k]
-  }[]
+  query: Array<
+    { omit?: boolean } & {
+      /**
+       * The field to search in.
+       */
+      [k in keyof Partial<FieldData>]: FieldData[k]
+    }
+  >
 
   /**
    * The limit of the record range.
    */
   limit?: number
+
+  /**
+   * The offset of the record range.
+   */
+  offset?: number
 
   /**
    * The layout to return the response from.

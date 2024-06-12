@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1] - 2024-06-12
+
+This release includes the ability to set an `offset` during finds.
+
+### Added
+
+- Added support for `offset` during finds.
+
 ## [1.2.0] - 2024-06-12
 
 This release includes small DX improvements and a bug fix.

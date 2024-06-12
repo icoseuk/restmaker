@@ -40,6 +40,11 @@ type FileMakerDataAPIFindRequest<FieldData> = {
   limit?: string
 
   /**
+   * The number of records to skip.
+   */
+  offset?: string
+
+  /**
    * The layout to return the response from.
    */
   'layout.response'?: string

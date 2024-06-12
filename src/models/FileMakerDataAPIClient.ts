@@ -280,6 +280,7 @@ export default class FileMakerDataAPIClient
     query,
     sort,
     limit = 100,
+    offset,
     portals,
     layoutResponse,
     ...scriptParams
@@ -295,6 +296,7 @@ export default class FileMakerDataAPIClient
         }
       }),
       limit: limit.toString(),
+      offset: offset?.toString(),
       sort,
       'layout.response': layoutResponse,
       ...portals?.reduce((acc, { name, limit, offset }) => {

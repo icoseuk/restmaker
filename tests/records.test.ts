@@ -141,10 +141,11 @@ test('finding a range of records that exist', async () => {
         sortOrder: 'ascend'
       }
     ],
-    limit: 5
+    limit: 5,
+    offset: 1
   })
   expect(request.dataInfo).toBeDefined()
-  expect(request.data.length).greaterThan(1)
+  expect(request.data.length).equal(5)
 })
 
 test('finding and sorting range of 5 records', async () => {
