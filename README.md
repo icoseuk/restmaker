@@ -38,7 +38,7 @@ This library is designed to work with the FileMaker Data API (REST). To use this
 import { RestMaker } from '@icose/restmaker'
 
 const restMaker = new RestMaker({
-  host: 'your-fm-server.com',
+  host: 'https://your-fm-server.com', // or http://your-fm-server.com
   database: 'your-database',
   username: 'your-username',
   password: 'your-password'
