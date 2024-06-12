@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2] - 2024-06-12
+
+This release includes an update to how session validation is handled.
+
+### Changed
+
+- The FileMaker Data API session is now validated before each request. **Note:** This change raises the minimum required FileMaker Server version to 19 or later.
+
 ## [1.0.1] - 2024-05-27
 
 This release includes a hot fix for the `package.json` index references.
