@@ -8,6 +8,10 @@ This release includes the ability to set an `offset` during finds.
 
 - Added support for `offset` during finds.
 
+### Fixed
+
+- Find query types are now correctly typed.
+
 ## [1.2.0] - 2024-06-12
 
 This release includes small DX improvements and a bug fix.
