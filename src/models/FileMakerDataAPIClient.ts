@@ -20,6 +20,8 @@ import FileMakerDataAPIRequest from '../types/FileMakerDataAPIRequest/FileMakerD
 import FileMakerDataAPICreateRecordResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPICreateRecordResponse'
 import FileMakerDataAPIDuplicateRecordResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIDuplicateRecordResponse'
 import FileMakerDataAPIEditRecordResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIEditRecordResponse'
+import FileMakerDataAPIFindResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIFindResponse'
+import FileMakerDataAPIGetRecordRangeResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIGetRecordRangeResponse'
 import FileMakerDataAPIGetRecordResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIGetRecordResponse'
 import FileMakerDataAPIResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIResponse'
 import FileMakerDataAPIRunScriptResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIRunScriptResponse'
@@ -254,7 +256,7 @@ export default class FileMakerDataAPIClient
 
     // Make the request to the FileMaker Data API.
     return this.session.request<
-      FileMakerDataAPIGetRecordResponse<FieldData, PortalData>,
+      FileMakerDataAPIGetRecordRangeResponse<FieldData, PortalData>,
       FileMakerDataAPIRequest
     >(`/layouts/${layout}/records?${queryString}`, 'GET')
   }
@@ -277,7 +279,7 @@ export default class FileMakerDataAPIClient
     ...scriptParams
   }: FindParameters<FieldData>) => {
     return this.session.request<
-      FileMakerDataAPIGetRecordResponse<FieldData, PortalData>,
+      FileMakerDataAPIFindResponse<FieldData, PortalData>,
       FileMakerDataAPIFindRequest<FieldData>
     >(`/layouts/${layout}/_find`, 'POST', {
       query: query.map((parameters) => {

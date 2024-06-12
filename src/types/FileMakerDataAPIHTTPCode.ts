@@ -52,3 +52,5 @@ type FileMakerDataAPIUnsupportedMediaTypeHTTPCode = 415
  * Includes FileMaker internal error messages and error codes.
  */
 type FileMakerDataAPIFileMakerErrorHTTPCode = 500
+
+export default FileMakerDataAPIHTTPCode

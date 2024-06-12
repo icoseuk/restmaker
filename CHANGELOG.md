@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.1] - 2024-06-12
+
+This release includes an important fix to type definitions, and CI/CD improvements.
+
+### Fixed
+
+- Added explicit exports to type definitions to fix import issues.
+
+### Changed
+
+- Improved CI/CD pipeline to include code coverage testing.
+
 ## [1.1.0] - 2024-06-12
 
 This release includes a major change in how the library is imported and used.
@@ -10,7 +22,7 @@ This release includes a major change in how the library is imported and used.
 
 ### Changed
 
-- Changed library type imports to use named imports instead of default imports.
+- Bundled library type definitions in a single file.
 - The entire bundle size is now just about 30KB, with types included.
 
 ## [1.0.2] - 2024-06-12
