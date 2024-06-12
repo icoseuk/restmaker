@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0] - 2024-06-12
+
+This release includes a major change in how the library is imported and used.
+
+### Added
+
+- Wrote code documentation on client methods.
+
+### Changed
+
+- Changed library type imports to use named imports instead of default imports.
+- The entire bundle size is now just about 30KB, with types included.
+
 ## [1.0.2] - 2024-06-12
 
 This release includes an update to how session validation is handled.

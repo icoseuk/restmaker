@@ -1,6 +1,6 @@
 {
   "name": "@icose/restmaker",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A TypeScript utility to connect to the FileMaker Data API (REST) seamlessly.",
   "keywords": [
     "filemaker",
@@ -17,7 +17,7 @@
     "test:auth": "vitest --reporter=verbose authentication.test.ts",
     "test:crud": "vitest --reporter=verbose records.test.ts",
     "test:scripts": "vitest --reporter=verbose scripts.test.ts",
-    "build": "tsc",
+    "build": "tsup",
     "format": "prettier --write .",
     "lint": "eslint src/**/*.ts"
   },
@@ -41,6 +41,7 @@
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.2.0",
     "prettier": "^3.2.5",
+    "tsup": "^8.1.0",
     "typescript": "^5.4.5",
     "typescript-eslint": "^8.0.0-alpha.10",
     "vitest": "^1.6.0"

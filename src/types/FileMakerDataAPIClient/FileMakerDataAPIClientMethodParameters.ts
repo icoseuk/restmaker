@@ -51,6 +51,9 @@ export type RequestLifecycleScriptExecution = {
   }
 }
 
+/**
+ * The parameters for creating a record in the FileMaker Data API.
+ */
 export type CreateRecordParameters<FieldData> = {
   /**
    * The layout to create the record in.
@@ -63,6 +66,9 @@ export type CreateRecordParameters<FieldData> = {
   fieldData: FileMakerDataAPIRecord<FieldData>['fieldData']
 } & RequestLifecycleScriptExecution
 
+/**
+ * The parameters for editing a record in the FileMaker Data API.
+ */
 export type EditRecordParameters<
   FieldData extends FileMakerDataAPIRecord['fieldData'],
   PortalData extends FileMakerDataAPIRecord['portalData']
@@ -98,6 +104,9 @@ export type EditRecordParameters<
     | Array<`${Extract<keyof PortalData, string>}.${number}`>
 } & RequestLifecycleScriptExecution
 
+/**
+ * The parameters for duplicating a record in the FileMaker Data API.
+ */
 export type DuplicateRecordParameters = {
   /**
    * The layout to duplicate the record in.
@@ -110,6 +119,9 @@ export type DuplicateRecordParameters = {
   recordId: string
 } & RequestLifecycleScriptExecution
 
+/**
+ * The parameters for deleting a record in the FileMaker Data API.
+ */
 export type DeleteRecordParameters = {
   /**
    * The layout to delete the record in.
@@ -122,6 +134,9 @@ export type DeleteRecordParameters = {
   recordId: string
 } & RequestLifecycleScriptExecution
 
+/**
+ * The parameters for getting a record from the FileMaker Data API.
+ */
 export type GetRecordParameters = {
   /**
    * The layout to get the record from.
@@ -159,6 +174,9 @@ export type GetRecordParameters = {
   }[]
 } & RequestLifecycleScriptExecution
 
+/**
+ * The parameters for getting a range of records from the FileMaker Data API.
+ */
 export type GetRecordRangeParameters = {
   /**
    * The layout to get the record range from.
@@ -216,6 +234,9 @@ export type GetRecordRangeParameters = {
   }[]
 } & RequestLifecycleScriptExecution
 
+/**
+ * The parameters for finding records in the FileMaker Data API.
+ */
 export type FindParameters<FieldData extends Record<string, unknown>> = {
   /**
    * The layout to get the record range from.
@@ -278,6 +299,9 @@ export type FindParameters<FieldData extends Record<string, unknown>> = {
   }[]
 } & RequestLifecycleScriptExecution
 
+/**
+ * The parameters for running a script in the FileMaker Data API.
+ */
 export type RunScriptParameters = {
   /**
    * The layout to run the script in.
@@ -295,6 +319,9 @@ export type RunScriptParameters = {
   scriptParameter?: string
 }
 
+/**
+ * The parameters for uploading container data in the FileMaker Data API.
+ */
 export type UpdateContainerDataParameters = {
   /**
    * The layout to update the container data in.
