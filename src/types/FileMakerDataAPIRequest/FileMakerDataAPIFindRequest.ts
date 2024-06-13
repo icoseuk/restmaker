@@ -7,12 +7,14 @@ type FileMakerDataAPIFindRequest<FieldData> = {
   /**
    * The query to search for.
    */
-  query: { omit?: 'true' | 'false' } & {
-    /**
-     * The field to search in.
-     */
-    [k in keyof FieldData]: FieldData[k]
-  }[]
+  query: Array<
+    { omit: 'true' | undefined } & {
+      /**
+       * The field to search in.
+       */
+      [k in keyof FieldData]: string
+    }
+  >
 
   /**
    * The sort order to use.

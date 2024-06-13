@@ -302,10 +302,11 @@ export default class FileMakerDataAPIClient
       FileMakerDataAPIFindRequest<FieldData>
     >(`/layouts/${layout}/_find`, 'POST', {
       query: query.map((parameters) => {
-        return {
-          ...parameters,
-          omit: parameters.omit ? 'true' : undefined
-        }
+        const casted = {
+          ...parameters
+        } as FileMakerDataAPIFindRequest<FieldData>['query'][0]
+        casted.omit = parameters.omit ? 'true' : undefined
+        return casted
       }),
       limit: limit?.toString(),
       offset: offset?.toString(),
