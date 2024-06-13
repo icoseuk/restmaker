@@ -7,6 +7,10 @@
 // Export the client.
 export { default as RestMaker } from './models/FileMakerDataAPIClient'
 
+// Export exception classes.
+export { default as FileMakerDataAPIHTTPException } from './exceptions/FileMakerDataAPIHTTPException'
+export { default as FileMakerDataAPIOperationException } from './exceptions/FileMakerDataAPIOperationException'
+
 /**
  * Type Definitions
  */

@@ -4,8 +4,8 @@ import FileMakerDataAPIRecord from '../FileMakerDataAPIRecord'
  * Represents the response from the FileMaker Data API when getting records.
  */
 type FileMakerDataAPIGetRecordResponse<
-  FieldData = Record<string, unknown>,
-  PortalData = Record<string, unknown>
+  FieldData = FileMakerDataAPIRecord['fieldData'],
+  PortalData = FileMakerDataAPIRecord['portalData']
 > = {
   data: FileMakerDataAPIRecord<FieldData, PortalData>[]
   dataInfo: {

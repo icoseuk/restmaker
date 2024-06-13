@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0] - 2024-06-13
+
+This release includes a fixon portal types and a new exception type.
+
+### Added
+
+- Added a new `FileMakerDataAPIHTTPException` exception type.
+- Added a new `FileMakerDataAPIOperationException` exception type.
+
+### Fixed
+
+- Generic method types that utilise portals are now correctly typed.
+
 ## [1.2.2] - 2024-06-12
 
 This release includes a fix regarding retrieving protals.

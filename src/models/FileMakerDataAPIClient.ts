@@ -127,8 +127,11 @@ export default class FileMakerDataAPIClient
   editRecord = async <
     FieldData extends
       FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData'],
-    PortalData extends
-      FileMakerDataAPIRecord['portalData'] = FileMakerDataAPIRecord['portalData']
+    PortalData extends {
+      [key: string]: Record<string, unknown>
+    } = {
+      [key: string]: Record<string, unknown>
+    }
   >({
     layout,
     recordId,
@@ -179,8 +182,11 @@ export default class FileMakerDataAPIClient
   getRecord = async <
     FieldData extends
       FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData'],
-    PortalData extends
-      FileMakerDataAPIRecord['portalData'] = FileMakerDataAPIRecord['portalData']
+    PortalData extends {
+      [key: string]: Record<string, unknown>
+    } = {
+      [key: string]: Record<string, unknown>
+    }
   >({
     layout,
     recordId,
@@ -222,8 +228,11 @@ export default class FileMakerDataAPIClient
   getRecordRange = async <
     FieldData extends
       FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData'],
-    PortalData extends
-      FileMakerDataAPIRecord['portalData'] = FileMakerDataAPIRecord['portalData']
+    PortalData extends {
+      [key: string]: Record<string, unknown>
+    } = {
+      [key: string]: Record<string, unknown>
+    }
   >({
     layout,
     startingIndex,
@@ -273,8 +282,11 @@ export default class FileMakerDataAPIClient
   find = async <
     FieldData extends
       FileMakerDataAPIRecord['fieldData'] = FileMakerDataAPIRecord['fieldData'],
-    PortalData extends
-      FileMakerDataAPIRecord['portalData'] = FileMakerDataAPIRecord['portalData']
+    PortalData extends {
+      [key: string]: Record<string, unknown>
+    } = {
+      [key: string]: Record<string, unknown>
+    }
   >({
     layout,
     query,

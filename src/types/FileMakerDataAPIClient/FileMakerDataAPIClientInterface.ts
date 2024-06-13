@@ -43,7 +43,9 @@ interface FileMakerDataAPIClientInterface {
    */
   editRecord<
     FieldData extends FileMakerDataAPIRecord['fieldData'],
-    PortalData extends FileMakerDataAPIRecord['portalData']
+    PortalData extends {
+      [key: string]: Record<string, unknown>
+    }
   >(
     params: EditRecordParameters<FieldData, PortalData>
   ): Promise<FileMakerDataAPIEditRecordResponse>
@@ -67,7 +69,9 @@ interface FileMakerDataAPIClientInterface {
    */
   getRecord<
     FieldData extends FileMakerDataAPIRecord['fieldData'],
-    PortalData extends FileMakerDataAPIRecord['portalData']
+    PortalData extends {
+      [key: string]: Record<string, unknown>
+    }
   >(
     params: GetRecordParameters
   ): Promise<FileMakerDataAPIGetRecordResponse<FieldData, PortalData>>
@@ -77,7 +81,9 @@ interface FileMakerDataAPIClientInterface {
    */
   getRecordRange<
     FieldData extends FileMakerDataAPIRecord['fieldData'],
-    PortalData extends FileMakerDataAPIRecord['portalData']
+    PortalData extends {
+      [key: string]: Record<string, unknown>
+    }
   >(
     params: GetRecordRangeParameters
   ): Promise<FileMakerDataAPIGetRecordResponse<FieldData, PortalData>>
@@ -87,7 +93,9 @@ interface FileMakerDataAPIClientInterface {
    */
   find<
     FieldData extends FileMakerDataAPIRecord['fieldData'],
-    PortalData extends FileMakerDataAPIRecord['portalData']
+    PortalData extends {
+      [key: string]: Record<string, unknown>
+    }
   >(
     params: FindParameters<FieldData>
   ): Promise<FileMakerDataAPIGetRecordResponse<FieldData, PortalData>>

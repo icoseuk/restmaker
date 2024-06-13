@@ -71,7 +71,9 @@ export type CreateRecordParameters<FieldData> = {
  */
 export type EditRecordParameters<
   FieldData extends FileMakerDataAPIRecord['fieldData'],
-  PortalData extends FileMakerDataAPIRecord['portalData']
+  PortalData extends {
+    [key: string]: Record<string, unknown>
+  }
 > = {
   /**
    * The layout to edit the record in.

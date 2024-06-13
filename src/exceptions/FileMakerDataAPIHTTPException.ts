@@ -1,3 +1,5 @@
+import FileMakerDataAPIHTTPCode from '../types/FileMakerDataAPIHTTPCode'
+
 /**
  * The exception that is thrown when an error occurs while interacting
  * with the FileMaker Data API.

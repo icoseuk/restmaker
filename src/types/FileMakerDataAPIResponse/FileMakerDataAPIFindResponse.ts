@@ -1,11 +1,12 @@
+import FileMakerDataAPIRecord from '../FileMakerDataAPIRecord'
 import FileMakerDataAPIGetRecordResponse from './FileMakerDataAPIGetRecordResponse'
 
 /**
  * Represents the response from the FileMaker Data API when finding records.
  */
 type FileMakerDataAPIFindResponse<
-  FieldData = Record<string, unknown>,
-  PortalData = Record<string, unknown>
+  FieldData = FileMakerDataAPIRecord['fieldData'],
+  PortalData = FileMakerDataAPIRecord['portalData']
 > = FileMakerDataAPIGetRecordResponse<FieldData, PortalData>
 
 export default FileMakerDataAPIFindResponse

@@ -3,7 +3,9 @@
  */
 type FileMakerDataAPIRecord<
   FieldData = Record<string, unknown>,
-  PortalData = Record<string, unknown>
+  PortalData = {
+    [key: string]: Record<string, unknown>
+  }
 > = {
   /**
    * The record ID.
