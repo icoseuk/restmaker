@@ -1,8 +1,17 @@
 # Changelog
 
+## [1.3.1] - 2024-06-13
+
+This release includes another small fix on types.
+
+### Fixed
+
+- Methods now include the correct return types for portals.
+- The `find` method now correctly casts all query values to strings.
+
 ## [1.3.0] - 2024-06-13
 
-This release includes a fixon portal types and a new exception type.
+This release includes a fix on portal types and a new exception type.
 
 ### Added
 

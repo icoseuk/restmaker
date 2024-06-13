@@ -252,8 +252,11 @@ export type FindParameters<FieldData extends Record<string, unknown>> = {
     { omit?: boolean } & {
       /**
        * The field to search in.
+       *
+       * Each value in the array is a search criteria for a single field,
+       * so it has been transformed to a string.
        */
-      [k in keyof Partial<FieldData>]: FieldData[k]
+      [k in keyof Partial<FieldData>]: string
     }
   >
 
