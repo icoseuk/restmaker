@@ -15,11 +15,12 @@ const {
 /**
  * The FileMaker Data API session to use for testing.
  */
-let client: RestMaker | null = new RestMaker({
+const client: RestMaker | null = new RestMaker({
   username: VITE_RESTMAKER_VALIDATOR_USERNAME,
   password: VITE_RESTMAKER_VALIDATOR_PASSWORD,
   host: VITE_RESTMAKER_VALIDATOR_HOST,
-  database: VITE_RESTMAKER_VALIDATOR_DATABASE
+  database: VITE_RESTMAKER_VALIDATOR_DATABASE,
+  enableProfiling: true
 })
 
 /**
@@ -132,7 +133,7 @@ test('finding a range of records that exist', async () => {
         Name: 'Test Product'
       },
       {
-        'Model Year': 2023
+        'Model Year': '2023'
       }
     ],
     sort: [
@@ -156,7 +157,7 @@ test('finding and sorting range of 5 records', async () => {
         Name: 'Test Product'
       },
       {
-        'Model Year': 2023
+        'Model Year': '2023'
       }
     ],
     sort: [
@@ -177,11 +178,11 @@ test('finding and sorting range of 5 records', async () => {
 test("finding a range of records that don't exist", async () => {
   await expect(
     async () =>
-      await client?.find({
+      await client?.find<{ 'Model Year': number }>({
         layout: 'Product Details',
         query: [
           {
-            'Model Year': 2023,
+            'Model Year': '2023',
             omit: true
           }
         ],

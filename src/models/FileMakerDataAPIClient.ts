@@ -40,6 +40,11 @@ export default class FileMakerDataAPIClient
   protected session: FileMakerDataAPISession
 
   /**
+   * Whether to enable profiling for the FileMaker Data API requests
+   */
+  protected profilingRequests: boolean = false
+
+  /**
    * Initializes a new FileMaker Data API client.
    *
    * @param username The username to use for authentication.
@@ -47,19 +52,23 @@ export default class FileMakerDataAPIClient
    * @param host The FileMaker Server host.
    * @param database The FileMaker database to use.
    * @param apiVersion The version of the FileMaker Data API to use.
+   * @param enableProfiling Whether to enable profiling for the FileMaker Data API requests.
+   *  This option logs time taken for each request endpoint.
    */
   constructor({
     username,
     password,
     host,
     database,
-    apiVersion
+    apiVersion,
+    enableProfiling
   }: {
     username: string
     password: string
     host: string
     database: string
     apiVersion?: FileMakerDataAPIVersion
+    enableProfiling?: boolean
   }) {
     this.session = new FileMakerDataAPISession(
       username,
@@ -68,6 +77,7 @@ export default class FileMakerDataAPIClient
       database,
       apiVersion
     )
+    this.profilingRequests = enableProfiling ?? false
   }
 
   /**
@@ -91,7 +101,7 @@ export default class FileMakerDataAPIClient
     script,
     prerequestScript,
     presortScript
-  }: RequestLifecycleScriptExecution): FileMakerDataAPIRequest<{}> => {
+  }: RequestLifecycleScriptExecution): FileMakerDataAPIRequest<object> => {
     const query = {
       script: script?.name,
       'script.param': script?.param,
@@ -103,7 +113,8 @@ export default class FileMakerDataAPIClient
 
     // Remove undefined values from the query object.
     return Object.fromEntries(
-      Object.entries(query).filter(([_, value]) => value !== undefined)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      Object.entries(query).filter(([_key, value]) => value !== undefined)
     )
   }
 
@@ -115,13 +126,15 @@ export default class FileMakerDataAPIClient
     fieldData,
     ...scriptParams
   }: CreateRecordParameters<FieldData>) => {
-    return this.session.request<
-      FileMakerDataAPICreateRecordResponse,
-      FileMakerDataAPICreateRecordRequest<FieldData>
-    >(`/layouts/${layout}/records`, 'POST', {
-      fieldData,
-      ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
-    })
+    return this.session
+      .withProfiling(this.profilingRequests)
+      .request<
+        FileMakerDataAPICreateRecordResponse,
+        FileMakerDataAPICreateRecordRequest<FieldData>
+      >(`/layouts/${layout}/records`, 'POST', {
+        fieldData,
+        ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
+      })
   }
 
   editRecord = async <
@@ -140,16 +153,18 @@ export default class FileMakerDataAPIClient
     deleteRelated,
     ...scriptParams
   }: EditRecordParameters<FieldData, PortalData>) => {
-    return this.session.request<FileMakerDataAPIEditRecordResponse>(
-      `/layouts/${layout}/records/${recordId}`,
-      'PATCH',
-      {
-        fieldData,
-        portalData,
-        deleteRelated,
-        ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
-      }
-    )
+    return this.session
+      .withProfiling(this.profilingRequests)
+      .request<FileMakerDataAPIEditRecordResponse>(
+        `/layouts/${layout}/records/${recordId}`,
+        'PATCH',
+        {
+          fieldData,
+          portalData,
+          deleteRelated,
+          ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
+        }
+      )
   }
 
   duplicateRecord = async ({
@@ -157,12 +172,14 @@ export default class FileMakerDataAPIClient
     recordId,
     ...scriptParams
   }: DuplicateRecordParameters) => {
-    return this.session.request<
-      FileMakerDataAPIDuplicateRecordResponse,
-      FileMakerDataAPIRequest
-    >(`/layouts/${layout}/records/${recordId}`, 'POST', {
-      ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
-    })
+    return this.session
+      .withProfiling(this.profilingRequests)
+      .request<
+        FileMakerDataAPIDuplicateRecordResponse,
+        FileMakerDataAPIRequest
+      >(`/layouts/${layout}/records/${recordId}`, 'POST', {
+        ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
+      })
   }
 
   deleteRecord = async ({
@@ -173,10 +190,12 @@ export default class FileMakerDataAPIClient
     const urlParams = new URLSearchParams(
       scriptParams ? this.parseScriptRequest(scriptParams) : {}
     )
-    return this.session.request<
-      FileMakerDataAPIResponse['response'],
-      FileMakerDataAPIRequest
-    >(`/layouts/${layout}/records/${recordId}/?${urlParams}`, 'DELETE')
+    return this.session
+      .withProfiling(this.profilingRequests)
+      .request<
+        FileMakerDataAPIResponse['response'],
+        FileMakerDataAPIRequest
+      >(`/layouts/${layout}/records/${recordId}/?${urlParams}`, 'DELETE')
   }
 
   getRecord = async <
@@ -209,7 +228,8 @@ export default class FileMakerDataAPIClient
 
     // Remove any undefined values from the query object.
     const cleanedQuery = Object.fromEntries(
-      Object.entries(query).filter(([_, value]) => value !== undefined)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      Object.entries(query).filter(([_key, value]) => value !== undefined)
     )
 
     // Convert the query object to a query string.
@@ -219,10 +239,12 @@ export default class FileMakerDataAPIClient
     }).toString()
 
     // Make the request to the FileMaker Data API.
-    return this.session.request<
-      FileMakerDataAPIGetRecordResponse<FieldData, PortalData>,
-      FileMakerDataAPIRequest
-    >(`/layouts/${layout}/records/${recordId}?${queryString}`, 'GET')
+    return this.session
+      .withProfiling(this.profilingRequests)
+      .request<
+        FileMakerDataAPIGetRecordResponse<FieldData, PortalData>,
+        FileMakerDataAPIRequest
+      >(`/layouts/${layout}/records/${recordId}?${queryString}`, 'GET')
   }
 
   getRecordRange = async <
@@ -260,7 +282,8 @@ export default class FileMakerDataAPIClient
 
     // Remove any undefined values from the query object.
     const cleanedQuery = Object.fromEntries(
-      Object.entries(query).filter(([_, value]) => value !== undefined)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      Object.entries(query).filter(([_key, value]) => value !== undefined)
     )
 
     // Convert the query object to a query string.
@@ -270,10 +293,12 @@ export default class FileMakerDataAPIClient
     }).toString()
 
     // Make the request to the FileMaker Data API.
-    return this.session.request<
-      FileMakerDataAPIGetRecordRangeResponse<FieldData, PortalData>,
-      FileMakerDataAPIRequest
-    >(`/layouts/${layout}/records?${queryString}`, 'GET')
+    return this.session
+      .withProfiling(this.profilingRequests)
+      .request<
+        FileMakerDataAPIGetRecordRangeResponse<FieldData, PortalData>,
+        FileMakerDataAPIRequest
+      >(`/layouts/${layout}/records?${queryString}`, 'GET')
   }
 
   /**
@@ -297,28 +322,30 @@ export default class FileMakerDataAPIClient
     layoutResponse,
     ...scriptParams
   }: FindParameters<FieldData>) => {
-    return this.session.request<
-      FileMakerDataAPIFindResponse<FieldData, PortalData>,
-      FileMakerDataAPIFindRequest<FieldData>
-    >(`/layouts/${layout}/_find`, 'POST', {
-      query: query.map((parameters) => {
-        const casted = {
-          ...parameters
-        } as FileMakerDataAPIFindRequest<FieldData>['query'][0]
-        casted.omit = parameters.omit ? 'true' : undefined
-        return casted
-      }),
-      limit: limit?.toString(),
-      offset: offset?.toString(),
-      sort,
-      'layout.response': layoutResponse,
-      ...portals?.reduce((acc, { name, limit, offset }) => {
-        if (offset) acc[`offset.${name}`] = offset.toString()
-        if (limit) acc[`limit.${name}`] = limit.toString()
-        return acc
-      }, {} as FileMakerDataAPIFindRequest<FieldData>),
-      ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
-    })
+    return this.session
+      .withProfiling(this.profilingRequests)
+      .request<
+        FileMakerDataAPIFindResponse<FieldData, PortalData>,
+        FileMakerDataAPIFindRequest<FieldData>
+      >(`/layouts/${layout}/_find`, 'POST', {
+        query: query.map((parameters) => {
+          const casted = {
+            ...parameters
+          } as FileMakerDataAPIFindRequest<FieldData>['query'][0]
+          casted.omit = parameters.omit ? 'true' : undefined
+          return casted
+        }),
+        limit: limit?.toString(),
+        offset: offset?.toString(),
+        sort,
+        'layout.response': layoutResponse,
+        ...portals?.reduce((acc, { name, limit, offset }) => {
+          if (offset) acc[`offset.${name}`] = offset.toString()
+          if (limit) acc[`limit.${name}`] = limit.toString()
+          return acc
+        }, {} as FileMakerDataAPIFindRequest<FieldData>),
+        ...(scriptParams ? this.parseScriptRequest(scriptParams) : {})
+      })
   }
 
   updateContainerData = async ({
@@ -330,12 +357,11 @@ export default class FileMakerDataAPIClient
     const formData = new FormData()
     formData.append('upload', file)
 
-    return this.session.multipartRequest<
-      FileMakerDataAPIResponse<{}>['response']
-    >(
-      `/layouts/${layout}/records/${recordId}/containers/${fieldName}`,
-      formData
-    )
+    return this.session
+      .withProfiling(this.profilingRequests)
+      .multipartRequest<
+        FileMakerDataAPIResponse<object>['response']
+      >(`/layouts/${layout}/records/${recordId}/containers/${fieldName}`, formData)
   }
 
   runScript = async ({
@@ -348,9 +374,11 @@ export default class FileMakerDataAPIClient
           'script.param': scriptParameter
         })
       : ''
-    return this.session.request<FileMakerDataAPIRunScriptResponse>(
-      `/layouts/${layout}/script/${encodeURIComponent(scriptName)}?${urlScriptParameter}`,
-      'GET'
-    )
+    return this.session
+      .withProfiling(this.profilingRequests)
+      .request<FileMakerDataAPIRunScriptResponse>(
+        `/layouts/${layout}/script/${encodeURIComponent(scriptName)}?${urlScriptParameter}`,
+        'GET'
+      )
   }
 }

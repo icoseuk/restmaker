@@ -1,6 +1,7 @@
 import FileMakerDataAPIOperationException from '../exceptions/FileMakerDataAPIOperationException'
 import FileMakerDataAPIResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIResponse'
 import FileMakerDataAPIVersion from '../types/FileMakerDataAPIVersion'
+import chalk from 'chalk'
 
 /**
  * A class that provides the version of the FileMaker Data API to use.
@@ -35,6 +36,11 @@ export default class FileMakerDataAPISession {
    * The version of the FileMaker Data API to use.
    */
   protected apiVersion: FileMakerDataAPIVersion = 'vLatest'
+
+  /**
+   * Whether to enable profiling for the FileMaker Data API.
+   */
+  protected profiling?: boolean = false
 
   /**
    * Creates a new FileMaker Data API authenticated session.
@@ -79,7 +85,7 @@ export default class FileMakerDataAPISession {
     await this.open()
 
     // Authenticate with the FileMaker Data API
-    const response = await fetch(
+    const response = await this.profiledRequest(
       `${this.host}/fmi/data/${this.apiVersion}/databases/${this.database}${endpoint}`,
       {
         method: 'POST',
@@ -102,7 +108,7 @@ export default class FileMakerDataAPISession {
    */
   request = async <
     FileMakerDataAPIResponseData,
-    FileMakerDataAPIRequestData = {}
+    FileMakerDataAPIRequestData = object
   >(
     endpoint: string,
     method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
@@ -115,7 +121,7 @@ export default class FileMakerDataAPISession {
     if (authentication === 'bearer') await this.open()
 
     // Authenticate with the FileMaker Data API
-    const response = await fetch(
+    const response = await this.profiledRequest(
       `${this.host}/fmi/data/${this.apiVersion}/databases/${this.database}${endpoint}`,
       {
         method,
@@ -187,7 +193,7 @@ export default class FileMakerDataAPISession {
     })
 
     // Return the response.
-    return data.response as FileMakerDataAPIResponse<FileMakerDataAPIResponseData>['response']
+    return data.response
   }
 
   /**
@@ -247,5 +253,35 @@ export default class FileMakerDataAPISession {
 
     // Clear the session token.
     FileMakerDataAPISession.token = undefined
+  }
+
+  /**
+   * Toggle profiling for FileMaker Data API session requests.
+   *
+   * @param profiling Whether to enable profiling for the FileMaker Data API.
+   * @returns The current instance of the FileMaker Data API session.
+   */
+  withProfiling = (profiling: boolean) => {
+    this.profiling = profiling
+    return this
+  }
+
+  /**
+   * Reports the time taken for an operation to execute.
+   *
+   * @param request The request to execute and report the time taken.
+   * @returns The response of the request.
+   */
+  profiledRequest = async (input: string, options: RequestInit) => {
+    const profileTimer = Date.now()
+    const response = await fetch(input, options)
+    if (this.profiling) {
+      const time = chalk.green(Date.now() - profileTimer)
+      console.log(
+        `Request to %c${chalk.grey(input)} took ${time}ms.`,
+        'color: #00f'
+      )
+    }
+    return response
   }
 }

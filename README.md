@@ -253,6 +253,20 @@ const result = await restMaker.runScript({
 })
 ```
 
+### Profiling mode
+
+You can enable profiling to see the time taken for each request. This is useful for debugging and performance tuning. To enable profiling, set the `enableProfiling` option to `true` when creating a new instance of `RestMaker`:
+
+```typescript
+const restMaker = new RestMaker({
+  host: 'https://your-fm-server.com',
+  database: 'your-database',
+  username: 'your-username',
+  password: 'your-password',
+  enableProfiling: true
+})
+```
+
 ## Contributing
 
 Check out the [Contributing Guidelines](CONTRIBUTING.md) to get started on contributing to this repository.

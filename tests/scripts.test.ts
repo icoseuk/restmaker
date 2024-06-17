@@ -17,7 +17,7 @@ const {
 /**
  * The FileMaker Data API session to use for testing.
  */
-let client: RestMaker | null = new RestMaker({
+const client: RestMaker | null = new RestMaker({
   username: VITE_RESTMAKER_VALIDATOR_USERNAME,
   password: VITE_RESTMAKER_VALIDATOR_PASSWORD,
   host: VITE_RESTMAKER_VALIDATOR_HOST,

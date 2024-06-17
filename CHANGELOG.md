@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0] - 2024-06-17
+
+This release includes a profiling mode.
+
+### Added
+
+- Added a new `enableProfiling` flag to the client constructor to enable profiling mode.
+
+### Fixed
+
+- Minor type corrections on tests.
+
 ## [1.3.1] - 2024-06-13
 
 This release includes another small fix on types.
