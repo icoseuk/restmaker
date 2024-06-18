@@ -53,7 +53,7 @@ export type FileMakerDataAPIClientOptions = {
     /**
      * The existing encrypted token for persistent mode.
      */
-    existingEncryptedToken?: string
+    existingEncryptedToken: string | null
   }
 
   /**

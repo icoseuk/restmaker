@@ -68,23 +68,21 @@ export default class FileMakerDataAPIToken {
   /**
    * Decrypt an encrypted token.
    *
-   * @param encryptionKey The encryption key.
+   * @param encryptionSecret The encryption key.
    * @param encryptedToken The encrypted token.
    *
    * @returns The decrypted token object.
    */
   public static decrypt(
-    encryptionKey: string,
+    encryptionSecret: string,
     encryptedToken: string
   ): FileMakerDataAPIToken {
+    // Hash the encryptionSecret to ensure it is 32 bytes
+    const hash = crypto.createHash('sha256').update(encryptionSecret).digest()
     const iv = Buffer.from(encryptedToken.slice(0, 32), 'hex') // IV is now 16 bytes, but represented as 32 hex characters
     const encryptedText = encryptedToken.slice(32, encryptedToken.length - 32) // Exclude the auth tag
     const authTag = Buffer.from(encryptedToken.slice(-32), 'hex') // Extract the auth tag
-    const decipher = crypto.createDecipheriv(
-      'aes-256-gcm',
-      Buffer.from(encryptionKey, 'hex'),
-      iv
-    )
+    const decipher = crypto.createDecipheriv('aes-256-gcm', hash, iv)
     decipher.setAuthTag(authTag)
     let decrypted = decipher.update(encryptedText, 'hex', 'utf8')
     decrypted += decipher.final('utf8')
@@ -98,18 +96,17 @@ export default class FileMakerDataAPIToken {
   /**
    * Encrypt a token.
    *
-   * @param encryptionKey The encryption key.
+   * @param encryptionSecret The encryption key.
    * @param token The token to encrypt.
    *
    * @returns The encrypted token.
    */
-  public encrypt(encryptionKey: string): string {
+  public encrypt(encryptionSecret: string): string {
+    // Hash the encryptionSecret to ensure it is 32 bytes
+    const hash = crypto.createHash('sha256').update(encryptionSecret).digest()
+
     const iv = crypto.randomBytes(16) // For AES-GCM, this is typically 16 bytes
-    const cipher = crypto.createCipheriv(
-      'aes-256-gcm',
-      Buffer.from(encryptionKey, 'hex'),
-      iv
-    )
+    const cipher = crypto.createCipheriv('aes-256-gcm', hash, iv)
     let encrypted = cipher.update(JSON.stringify(this), 'utf8', 'hex')
     encrypted += cipher.final('hex')
     const authTag = cipher.getAuthTag()
