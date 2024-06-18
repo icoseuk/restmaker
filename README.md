@@ -19,6 +19,9 @@ A TypeScript utility to connect to the FileMaker Data API (REST) seamlessly.
     - [Find records](#find-records)
     - [Running a script in a request](#running-a-script-in-a-request)
     - [Running a script standalone](#running-a-script-standalone)
+  - [Profiling mode](#profiling-mode)
+  - [Persistent mode](#persistent-mode)
+    - [Getting the token](#getting-the-token)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -263,9 +266,38 @@ const restMaker = new RestMaker({
   database: 'your-database',
   username: 'your-username',
   password: 'your-password',
-  enableProfiling: true
+  profilingMode: true
 })
 ```
+
+### Persistent mode
+
+You can enable persistence to keep the session token between client instances (e.g. when using the library in a serverless environment). To enable persistence, set the `enablePersistence` option to `true` when creating a new instance of `RestMaker`:
+
+```typescript
+const restMaker = new RestMaker({
+  host: 'https://your-fm-server.com',
+  database: 'your-database',
+  username: 'your-username',
+  password: 'your-password',
+  persistentMode: {
+    tokenEncryptionKey: 'your-encryption-key',
+    existingEncryptedToken: null || 'your-existing-token'
+  }
+})
+```
+
+The `existingEncryptedToken` option is used to provide an existing encrypted token. This is useful when you want to keep the token between client instances, otherwise read below on how to get the token on the first run.
+
+#### Getting the token
+
+If you don't have a token and you want to get it, you can use the `token()` method:
+
+```typescript
+const token = await restMaker.token()
+```
+
+**Note:** The token is always encrypted by default with its embedded expiration time, so you don't need to worry about anything else.
 
 ## Contributing
 

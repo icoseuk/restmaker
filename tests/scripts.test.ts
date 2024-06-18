@@ -21,7 +21,8 @@ const client: RestMaker | null = new RestMaker({
   username: VITE_RESTMAKER_VALIDATOR_USERNAME,
   password: VITE_RESTMAKER_VALIDATOR_PASSWORD,
   host: VITE_RESTMAKER_VALIDATOR_HOST,
-  database: VITE_RESTMAKER_VALIDATOR_DATABASE
+  database: VITE_RESTMAKER_VALIDATOR_DATABASE,
+  profilingMode: true
 })
 
 /**

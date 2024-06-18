@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.5.0] - 2024-06-18
+
+This release introduces Persistent Mode.
+
+### Added
+
+- Added a new `persistentMode` property to the client constructor to configure persistent mode.
+
+### Changed
+
+- The `enableProfiling` flag has been renamed to `profilingMode` for consistency.
+
 ## [1.4.0] - 2024-06-17
 
 This release includes a profiling mode.
