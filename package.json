@@ -1,6 +1,6 @@
 {
   "name": "@icose/restmaker",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "A TypeScript utility to connect to the FileMaker Data API (REST) seamlessly.",
   "keywords": [
     "filemaker",
@@ -10,8 +10,20 @@
     "rest",
     "typescript"
   ],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
     "test:coverage": "vitest --reporter=verbose --coverage --coverage.reporter=lcov --coverage.all",
     "test:all": "vitest --reporter=verbose",

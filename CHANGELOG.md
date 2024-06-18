@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.1] - 2024-06-18
+
+This release introduces support for ESM and CJS module imports.
+
+### Added
+
+- Added support for both ESM and CJS module imports.
+
 ## [1.5.0] - 2024-06-18
 
 This release introduces Persistent Mode.
