@@ -16,6 +16,51 @@ import FileMakerDataAPIEditRecordResponse from '../FileMakerDataAPIResponse/File
 import FileMakerDataAPIGetRecordResponse from '../FileMakerDataAPIResponse/FileMakerDataAPIGetRecordResponse'
 import FileMakerDataAPIResponse from '../FileMakerDataAPIResponse/FileMakerDataAPIResponse'
 import FileMakerDataAPIRunScriptResponse from '../FileMakerDataAPIResponse/FileMakerDataAPIRunScriptResponse'
+import FileMakerDataAPIVersion from '../FileMakerDataAPIVersion'
+
+/**
+ * The options for the FileMaker Data API client.
+ */
+export type FileMakerDataAPIClientOptions = {
+  /**
+   * The host URL of the FileMaker server.
+   */
+  host: string
+  /**
+   * The name of the FileMaker database.
+   */
+  database: string
+  /**
+   * The username for authentication.
+   */
+  username: string
+  /**
+   * The password for authentication.
+   */
+  password: string
+  /**
+   * The version of the FileMaker Data API.
+   */
+  apiVersion?: FileMakerDataAPIVersion
+  /**
+   * The Persistent Mode options. If this is set, the client will use the Persistent Mode.
+   */
+  persistentMode?: {
+    /**
+     * The encryption key for persistent mode.
+     */
+    tokenEncryptionKey: string
+    /**
+     * The existing encrypted token for persistent mode.
+     */
+    existingEncryptedToken?: string
+  }
+
+  /**
+   * The Profiling Mode toggle.
+   */
+  profilingMode?: boolean
+}
 
 /**
  * Represents the client for the FileMaker Data API.
@@ -113,6 +158,11 @@ interface FileMakerDataAPIClientInterface {
   runScript(
     params: RunScriptParameters
   ): Promise<FileMakerDataAPIRunScriptResponse>
+
+  /**
+   * Returns an encrypted version of the FileMaker Data API session token.
+   */
+  token(): Promise<string>
 }
 
 export default FileMakerDataAPIClientInterface

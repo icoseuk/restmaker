@@ -1,4 +1,6 @@
-import FileMakerDataAPIClientInterface from '../types/FileMakerDataAPIClient/FileMakerDataAPIClientInterface'
+import FileMakerDataAPIClientInterface, {
+  FileMakerDataAPIClientOptions
+} from '../types/FileMakerDataAPIClient/FileMakerDataAPIClientInterface'
 import {
   CreateRecordParameters,
   DeleteRecordParameters,
@@ -25,7 +27,7 @@ import FileMakerDataAPIGetRecordRangeResponse from '../types/FileMakerDataAPIRes
 import FileMakerDataAPIGetRecordResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIGetRecordResponse'
 import FileMakerDataAPIResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIResponse'
 import FileMakerDataAPIRunScriptResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIRunScriptResponse'
-import FileMakerDataAPIVersion from '../types/FileMakerDataAPIVersion'
+import FileMakerDataAPIPersistentSession from './FileMakerDataAPIPersistentSession'
 import FileMakerDataAPISession from './FileMakerDataAPISession'
 
 /**
@@ -42,7 +44,12 @@ export default class FileMakerDataAPIClient
   /**
    * Whether to enable profiling for the FileMaker Data API requests
    */
-  protected profilingRequests: boolean = false
+  protected profiling: boolean = false
+
+  /**
+   * Whether to use the persistent mode for the FileMaker Data API requests
+   */
+  protected persistent: boolean = false
 
   /**
    * Initializes a new FileMaker Data API client.
@@ -61,23 +68,30 @@ export default class FileMakerDataAPIClient
     host,
     database,
     apiVersion,
-    enableProfiling
-  }: {
-    username: string
-    password: string
-    host: string
-    database: string
-    apiVersion?: FileMakerDataAPIVersion
-    enableProfiling?: boolean
-  }) {
-    this.session = new FileMakerDataAPISession(
-      username,
-      password,
-      host,
-      database,
-      apiVersion
-    )
-    this.profilingRequests = enableProfiling ?? false
+    persistentMode,
+    profilingMode
+  }: FileMakerDataAPIClientOptions) {
+    this.session =
+      persistentMode !== undefined
+        ? new FileMakerDataAPIPersistentSession({
+            username,
+            password,
+            host,
+            database,
+            apiVersion,
+            tokenEncryptionKey: persistentMode.tokenEncryptionKey,
+            existingEncryptedToken:
+              persistentMode.existingEncryptedToken ?? null
+          })
+        : new FileMakerDataAPISession({
+            username,
+            password,
+            host,
+            database,
+            apiVersion
+          })
+    this.persistent = persistentMode !== undefined
+    this.profiling = profilingMode ?? false
   }
 
   /**
@@ -127,7 +141,7 @@ export default class FileMakerDataAPIClient
     ...scriptParams
   }: CreateRecordParameters<FieldData>) => {
     return this.session
-      .withProfiling(this.profilingRequests)
+      .withProfiling(this.profiling)
       .request<
         FileMakerDataAPICreateRecordResponse,
         FileMakerDataAPICreateRecordRequest<FieldData>
@@ -154,7 +168,7 @@ export default class FileMakerDataAPIClient
     ...scriptParams
   }: EditRecordParameters<FieldData, PortalData>) => {
     return this.session
-      .withProfiling(this.profilingRequests)
+      .withProfiling(this.profiling)
       .request<FileMakerDataAPIEditRecordResponse>(
         `/layouts/${layout}/records/${recordId}`,
         'PATCH',
@@ -173,7 +187,7 @@ export default class FileMakerDataAPIClient
     ...scriptParams
   }: DuplicateRecordParameters) => {
     return this.session
-      .withProfiling(this.profilingRequests)
+      .withProfiling(this.profiling)
       .request<
         FileMakerDataAPIDuplicateRecordResponse,
         FileMakerDataAPIRequest
@@ -191,7 +205,7 @@ export default class FileMakerDataAPIClient
       scriptParams ? this.parseScriptRequest(scriptParams) : {}
     )
     return this.session
-      .withProfiling(this.profilingRequests)
+      .withProfiling(this.profiling)
       .request<
         FileMakerDataAPIResponse['response'],
         FileMakerDataAPIRequest
@@ -240,7 +254,7 @@ export default class FileMakerDataAPIClient
 
     // Make the request to the FileMaker Data API.
     return this.session
-      .withProfiling(this.profilingRequests)
+      .withProfiling(this.profiling)
       .request<
         FileMakerDataAPIGetRecordResponse<FieldData, PortalData>,
         FileMakerDataAPIRequest
@@ -294,7 +308,7 @@ export default class FileMakerDataAPIClient
 
     // Make the request to the FileMaker Data API.
     return this.session
-      .withProfiling(this.profilingRequests)
+      .withProfiling(this.profiling)
       .request<
         FileMakerDataAPIGetRecordRangeResponse<FieldData, PortalData>,
         FileMakerDataAPIRequest
@@ -323,7 +337,7 @@ export default class FileMakerDataAPIClient
     ...scriptParams
   }: FindParameters<FieldData>) => {
     return this.session
-      .withProfiling(this.profilingRequests)
+      .withProfiling(this.profiling)
       .request<
         FileMakerDataAPIFindResponse<FieldData, PortalData>,
         FileMakerDataAPIFindRequest<FieldData>
@@ -358,7 +372,7 @@ export default class FileMakerDataAPIClient
     formData.append('upload', file)
 
     return this.session
-      .withProfiling(this.profilingRequests)
+      .withProfiling(this.profiling)
       .multipartRequest<
         FileMakerDataAPIResponse<object>['response']
       >(`/layouts/${layout}/records/${recordId}/containers/${fieldName}`, formData)
@@ -375,10 +389,17 @@ export default class FileMakerDataAPIClient
         })
       : ''
     return this.session
-      .withProfiling(this.profilingRequests)
+      .withProfiling(this.profiling)
       .request<FileMakerDataAPIRunScriptResponse>(
         `/layouts/${layout}/script/${encodeURIComponent(scriptName)}?${urlScriptParameter}`,
         'GET'
       )
+  }
+
+  async token() {
+    if (!this.persistent) {
+      throw new Error('You need to enable Persistent Mode to save the session.')
+    }
+    return await (this.session as FileMakerDataAPIPersistentSession).persist()
   }
 }

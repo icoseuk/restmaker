@@ -2,6 +2,34 @@ import FileMakerDataAPIOperationException from '../exceptions/FileMakerDataAPIOp
 import FileMakerDataAPIResponse from '../types/FileMakerDataAPIResponse/FileMakerDataAPIResponse'
 import FileMakerDataAPIVersion from '../types/FileMakerDataAPIVersion'
 import chalk from 'chalk'
+import FileMakerDataAPIToken from './FileMakerDataAPIToken'
+
+type FileMakerDataAPISessionOptions = {
+  /**
+   * The username to use for authentication.
+   */
+  username: string
+
+  /**
+   * The password to use for authentication.
+   */
+  password: string
+
+  /**
+   * The FileMaker Server host.
+   */
+  host: string
+
+  /**
+   * The FileMaker database to use.
+   */
+  database: string
+
+  /**
+   * The version of the FileMaker Data API to use.
+   */
+  apiVersion?: FileMakerDataAPIVersion
+}
 
 /**
  * A class that provides the version of the FileMaker Data API to use.
@@ -30,7 +58,7 @@ export default class FileMakerDataAPISession {
   /**
    * The token to use for authentication.
    */
-  private static token?: string
+  protected static token?: FileMakerDataAPIToken
 
   /**
    * The version of the FileMaker Data API to use.
@@ -51,13 +79,13 @@ export default class FileMakerDataAPISession {
    * @param database The FileMaker database to use.
    * @param apiVersion The version of the FileMaker Data API to use.
    */
-  constructor(
-    username: string,
-    password: string,
-    host: string,
-    database: string,
-    apiVersion: FileMakerDataAPIVersion = 'vLatest'
-  ) {
+  constructor({
+    username,
+    password,
+    host,
+    database,
+    apiVersion = 'vLatest'
+  }: FileMakerDataAPISessionOptions) {
     // Check if the host starts with http:// or https://, if not, prepend https://
     // This forces the host to be a valid and secure URL.
     if (!host.startsWith('http://') && !host.startsWith('https://')) {
@@ -77,10 +105,10 @@ export default class FileMakerDataAPISession {
    * @param endpoint The database specific endpoint to send the request to.
    * @param body The body of the request to send.
    */
-  multipartRequest = async <FileMakerDataAPIResponseData>(
+  public async multipartRequest<FileMakerDataAPIResponseData>(
     endpoint: string,
     body: FormData
-  ) => {
+  ) {
     // Ensure the session is open.
     await this.open()
 
@@ -90,7 +118,7 @@ export default class FileMakerDataAPISession {
       {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${FileMakerDataAPISession.token}`
+          Authorization: `Bearer ${FileMakerDataAPISession.token?.use()}`
         },
         body
       }
@@ -106,7 +134,7 @@ export default class FileMakerDataAPISession {
    * @param method The HTTP method to use for the request.
    * @param authentication The type of authentication to use for the request. Can be 'basic' or 'bearer'.
    */
-  request = async <
+  public async request<
     FileMakerDataAPIResponseData,
     FileMakerDataAPIRequestData = object
   >(
@@ -116,7 +144,7 @@ export default class FileMakerDataAPISession {
     authentication: 'basic' | 'bearer' = 'bearer'
   ): Promise<
     FileMakerDataAPIResponse<FileMakerDataAPIResponseData>['response']
-  > => {
+  > {
     // Ensure the session is open.
     if (authentication === 'bearer') await this.open()
 
@@ -130,7 +158,7 @@ export default class FileMakerDataAPISession {
           Authorization:
             authentication === 'basic'
               ? `Basic ${btoa(`${this.username}:${this.password}`)}`
-              : `Bearer ${FileMakerDataAPISession.token}`
+              : `Bearer ${FileMakerDataAPISession.token?.use()}`
         },
         body: method === 'GET' ? undefined : JSON.stringify(body)
       }
@@ -142,27 +170,38 @@ export default class FileMakerDataAPISession {
   /**
    * Sends a request to the FileMaker Data API to validate a session token.
    *
-   * @param token The session token to validate.
+   * @param strict Whether to strictly validate the session with the FileMaker Data API.
    *
    * @returns The response from the request.
    */
-  validateSession = async () =>
-    await fetch(`${this.host}/fmi/data/${this.apiVersion}/validateSession`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${FileMakerDataAPISession.token}`
-      }
-    })
+  protected async validateSession(strict: boolean = false): Promise<boolean> {
+    if (strict) {
+      const sessionValidationResponse = await this.profiledRequest(
+        `${this.host}/fmi/data/${this.apiVersion}/validateSession`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${FileMakerDataAPISession.token?.use()}`
+          }
+        }
+      )
+      return sessionValidationResponse.status === 401
+    }
+    return (
+      FileMakerDataAPISession.token !== undefined &&
+      !FileMakerDataAPISession.token.expired()
+    )
+  }
 
   /**
    * Interprets a JSON response from the FileMaker Data API and checks for errors.
    *
    * @param response The response to interpret.
    */
-  interpretJsonResponse = async <FileMakerDataAPIResponseData>(
+  protected async interpretJsonResponse<FileMakerDataAPIResponseData>(
     response: Response
-  ) => {
+  ) {
     // Parse the response JSON.
     let data: FileMakerDataAPIResponse<FileMakerDataAPIResponseData>
     try {
@@ -204,15 +243,15 @@ export default class FileMakerDataAPISession {
    * @throws {FileMakerDataAPIHTTPException} If an error occurs while interacting with the FileMaker Data API.
    * @throws {FileMakerDataAPIOperationException} If an error occurs while interacting with the FileMaker Data API.
    */
-  open = async (): Promise<boolean> => {
+  public async open(): Promise<boolean> {
     if (FileMakerDataAPISession.token === undefined) {
       // Start a new session.
       FileMakerDataAPISession.token = await this.create()
       return true
     } else {
       // Validate if the current session has not expired.
-      const sessionValidationResponse = await this.validateSession()
-      if (sessionValidationResponse.status === 401) {
+      const validExistingSession = await this.validateSession()
+      if (!validExistingSession) {
         FileMakerDataAPISession.token = await this.create()
         return true
       }
@@ -225,15 +264,17 @@ export default class FileMakerDataAPISession {
    *
    * This method sends a request to the FileMaker Data API to create a new session.
    */
-  create = async () => {
+  protected async create() {
     const response = await this.request<{ token: string }>(
       '/sessions',
       'POST',
       {},
       'basic'
     )
-    FileMakerDataAPISession.token = response.token
-    return response.token
+
+    return new FileMakerDataAPIToken({
+      value: response.token
+    })
   }
 
   /**
@@ -245,11 +286,14 @@ export default class FileMakerDataAPISession {
    * @throws {FileMakerDataAPIHTTPException} If an error occurs while interacting with the FileMaker Data API.
    * @throws {FileMakerDataAPIOperationException} If an error occurs while interacting with the FileMaker Data API.
    */
-  close = async () => {
+  public async close() {
     if (!FileMakerDataAPISession.token) return
 
     // End the session.
-    await this.request(`/sessions/${FileMakerDataAPISession.token}`, 'DELETE')
+    await this.request(
+      `/sessions/${FileMakerDataAPISession.token.use()}`,
+      'DELETE'
+    )
 
     // Clear the session token.
     FileMakerDataAPISession.token = undefined
@@ -261,7 +305,7 @@ export default class FileMakerDataAPISession {
    * @param profiling Whether to enable profiling for the FileMaker Data API.
    * @returns The current instance of the FileMaker Data API session.
    */
-  withProfiling = (profiling: boolean) => {
+  public withProfiling(profiling: boolean) {
     this.profiling = profiling
     return this
   }
@@ -272,7 +316,7 @@ export default class FileMakerDataAPISession {
    * @param request The request to execute and report the time taken.
    * @returns The response of the request.
    */
-  profiledRequest = async (input: string, options: RequestInit) => {
+  protected async profiledRequest(input: string, options: RequestInit) {
     const profileTimer = Date.now()
     const response = await fetch(input, options)
     if (this.profiling) {
